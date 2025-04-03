@@ -1,0 +1,107 @@
+1743699464928:winequality <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv", sep = ";")
+1743699500464:winequality <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv", sep = ";")
+1743699502112:winequality
+1743701037359:summary(winequality)
+1743701105272:tail(winequality, n = 3)
+1743701325074:tail(winequality, n = 3)
+1743701325082:# summary
+1743701325082:summary(winequality)
+1743701338932:source("~/wine_quality_predict.R", echo=TRUE)
+1743701340621:tail(winequality, n = 3)
+1743701340627:# summary
+1743701340627:summary(winequality)
+1743701344395:tail(winequality, n = 3)
+1743701344399:# summary
+1743701344399:summary(winequality)
+1743701551206:tail(winequality, n = 3)
+1743701551211:# summary
+1743701551211:summary(winequality)
+1743702423195:outlier (detect)
+1743702427305:# outlier (detect)
+1743702427305:outlier_vars <- c("residual.sugar", "chlorides", "total.sulfur.dioxide")
+1743702427305:# IQR method
+1743702427305:detect_outliers <- function(x) {
+1743702427306:Q1 <- quantile(x, 0.25, na.rm = TRUE)
+1743702427306:Q3 <- quantile(x, 0.75, na.rm = TRUE)
+1743702427306:IQR <- Q3 - Q1
+1743702427306:lower_bound <- Q1 - 1.5 * IQR
+1743702427306:upper_bound <- Q3 + 1.5 * IQR
+1743702427306:return(list(lower = lower_bound, upper = upper_bound))
+1743702427307:}
+1743702427307:rs_bounds <- detect_outliers(winequality$residual.sugar)
+1743702427309:cat("Residual Sugar Outlier Bounds:", rs_bounds$lower, "to", rs_bounds$upper, "\n")
+1743702511333:# winsorize outliers (cap at 1st and 99th percentiles)
+1743702511334:winsorize <- function(x) {
+1743702511334:quantiles <- quantile(x, probs = c(0.01, 0.99), na.rm = TRUE)
+1743702511334:x[x < quantiles[1]] <- quantiles[1]
+1743702511334:x[x > quantiles[2]] <- quantiles[2]
+1743702511334:return(x)
+1743702511334:}
+1743702562407:winequality <- winequality %>%
+1743702562407:mutate(
+1743702562407:residual.sugar = winsorize(residual.sugar),
+1743702562407:chlorides = winsorize(chlorides),
+1743702562407:total.sulfur.dioxide = winsorize(total.sulfur.dioxide)
+1743702562407:)
+1743702568299:# winsorize outliers (cap at 1st and 99th percentiles)
+1743702568300:winsorize <- function(x) {
+1743702568300:quantiles <- quantile(x, probs = c(0.01, 0.99), na.rm = TRUE)
+1743702568300:x[x < quantiles[1]] <- quantiles[1]
+1743702568301:x[x > quantiles[2]] <- quantiles[2]
+1743702568301:return(x)
+1743702568302:}
+1743702568302:winequality <- winequality %>%
+1743702568303:mutate(
+1743702568303:residual.sugar = winsorize(residual.sugar),
+1743702568303:chlorides = winsorize(chlorides),
+1743702568303:total.sulfur.dioxide = winsorize(total.sulfur.dioxide)
+1743702568303:)
+1743702741133:boxplot(winequality$residual.sugar, main = "Residual Sugar Distribution", ylab = "Residual Sugar")
+1743703171981:outlier_vars <- c("residual.sugar", "chlorides", "total.sulfur.dioxide")
+1743703171982:par(mfrow = c(1, 3))  # Arrange plots in 1 row, 3 columns
+1743703171982:for (var in outlier_vars) {
+1743703171982:boxplot(winequality[[var]],
+1743703171982:main = paste(var, "Distribution"),
+1743703171982:ylab = var)
+1743703171982:}
+1743703184835:detect_outliers <- function(x) {
+1743703184836:Q1 <- quantile(x, 0.25, na.rm = TRUE)
+1743703184836:Q3 <- quantile(x, 0.75, na.rm = TRUE)
+1743703184836:IQR <- Q3 - Q1
+1743703184836:lower_bound <- Q1 - 1.5 * IQR
+1743703184836:upper_bound <- Q3 + 1.5 * IQR
+1743703184836:return(list(lower = lower_bound, upper = upper_bound))
+1743703184836:}
+1743703242578:winsorize <- function(x) {
+1743703242578:quantiles <- quantile(x, probs = c(0.01, 0.99), na.rm = TRUE)
+1743703242579:x[x < quantiles[1]] <- quantiles[1]
+1743703242579:x[x > quantiles[2]] <- quantiles[2]
+1743703242579:return(x)
+1743703242579:}
+1743703253205:winequality <- winequality %>%
+1743703253205:mutate(across(all_of(outlier_vars), ~ winsorize(.x)))
+1743703550500:winsorize_iqr <- function(x) {
+1743703550501:bounds <- detect_outliers(x)
+1743703550501:x[x < bounds$lower] <- bounds$lower  # Replace lower outliers with Q1 - 1.5*IQR
+1743703550501:x[x > bounds$upper] <- bounds$upper  # Replace upper outliers with Q3 + 1.5*IQR
+1743703550501:return(x)
+1743703550502:}
+1743703550502:winequality <- winequality %>%
+1743703550502:mutate(across(all_of(outlier_vars), ~ winsorize(.x)))
+1743703591784:install.packages("dplyr")
+1743703621960:library(dplyr)
+1743703655163:# winsorize outliers
+1743703655163:winsorize_iqr <- function(x) {
+1743703655164:bounds <- detect_outliers(x)
+1743703655164:x[x < bounds$lower] <- bounds$lower  # Replace lower outliers with Q1 - 1.5*IQR
+1743703655164:x[x > bounds$upper] <- bounds$upper  # Replace upper outliers with Q3 + 1.5*IQR
+1743703655164:return(x)
+1743703655164:}
+1743703655165:winequality <- winequality %>%
+1743703655165:mutate(across(all_of(outlier_vars), ~ winsorize(.x)))
+1743703655201:tail(winequality, n=3)
+1743703674036:summary(winequality)
+1743703686168:winequality <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv", sep = ";")
+1743703687590:tail(winequality, n=3)
+1743703687598:# summary
+1743703687599:summary(winequality)
