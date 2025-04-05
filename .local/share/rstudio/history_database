@@ -4379,3 +4379,88 @@
 1743853503078:units = "in",
 1743853503078:dpi = 300,
 1743853503078:limitsize = FALSE)
+1743854063844:# layout
+1743854063844:n_features <- length(predictor_vars)
+1743854063844:n_rows <- ceiling(n_features / 1)
+1743854063845:height <- max(20, n_rows * 5)
+1743854063845:ggplot(comparison_all, aes(x = Value, fill = Type)) +
+1743854063845:geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+1743854063845:# min/max lines
+1743854063845:geom_vline(data = summary_all,
+1743854063846:aes(xintercept = Min, color = Type),
+1743854063846:linetype = "dashed") +
+1743854063846:geom_vline(data = summary_all,
+1743854063846:aes(xintercept = Max, color = Type),
+1743854063846:linetype = "dashed") +
+1743854063847:# Facet grid
+1743854063847:facet_wrap(~ Feature,
+1743854063847:scales = "free",
+1743854063847:ncol = 1,
+1743854063847:labeller = label_wrap_gen(width = 25)) +
+1743854063848:# color & style
+1743854063848:scale_fill_manual(values = c("Original" = "lightblue", "Scaled" = "lightgreen")) +
+1743854063848:scale_color_manual(values = c("Original" = "blue", "Scaled" = "green")) +
+1743854063849:labs(title = "Min-Max Scaling Effects Across All Features",
+1743854063850:subtitle = "Blue: Original | Green: Scaled [0,1]",
+1743854063850:x = "Value",
+1743854063850:y = "Count") +
+1743854063850:theme_minimal(base_size = 22) +
+1743854063851:theme(
+1743854063851:legend.position = "bottom",
+1743854063851:legend.text = element_text(size = 22),
+1743854063851:axis.text.x = element_text(angle = 0, hjust = 1, size = 10),
+1743854063851:axis.text.y = element_text(size = 22),
+1743854063852:axis.title = element_text(size = 22),
+1743854063852:strip.text = element_text(size = 22, face = "bold"),
+1743854063852:plot.title = element_text(size = 22, face = "bold"),
+1743854063852:plot.subtitle = element_text(size = 22),
+1743854063853:panel.spacing = unit(1.5, "lines")
+1743854063853:)
+1743854064978:ggsave("min_max_scaling.png",
+1743854064979:width = 20,
+1743854064979:height = height,
+1743854064979:units = "in",
+1743854064980:dpi = 300,
+1743854064980:limitsize = FALSE)
+1743854093780:n_features <- length(predictor_vars)
+1743854093780:n_rows <- ceiling(n_features / 1)
+1743854093780:height <- max(20, n_rows * 5)
+1743854093781:ggplot(comparison_all, aes(x = Value, fill = Type)) +
+1743854093781:geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+1743854093781:# min/max lines
+1743854093781:geom_vline(data = summary_all,
+1743854093782:aes(xintercept = Min, color = Type),
+1743854093782:linetype = "dashed") +
+1743854093782:geom_vline(data = summary_all,
+1743854093782:aes(xintercept = Max, color = Type),
+1743854093782:linetype = "dashed") +
+1743854093783:# Facet grid
+1743854093783:facet_wrap(~ Feature,
+1743854093783:scales = "free",
+1743854093783:ncol = 1,
+1743854093784:labeller = label_wrap_gen(width = 25)) +
+1743854093784:# color & style
+1743854093784:scale_fill_manual(values = c("Original" = "lightblue", "Scaled" = "lightgreen")) +
+1743854093784:scale_color_manual(values = c("Original" = "blue", "Scaled" = "green")) +
+1743854093785:labs(title = "Min-Max Scaling Effects Across All Features",
+1743854093785:subtitle = "Blue: Original | Green: Scaled [0,1]",
+1743854093785:x = "Value",
+1743854093785:y = "Count") +
+1743854093785:theme_minimal(base_size = 22) +
+1743854093786:theme(
+1743854093786:legend.position = "bottom",
+1743854093786:legend.text = element_text(size = 22),
+1743854093786:axis.text.x = element_text(angle = 0, hjust = 1, size = 22),
+1743854093786:axis.text.y = element_text(size = 22),
+1743854093787:axis.title = element_text(size = 22),
+1743854093787:strip.text = element_text(size = 22, face = "bold"),
+1743854093787:plot.title = element_text(size = 22, face = "bold"),
+1743854093787:plot.subtitle = element_text(size = 22),
+1743854093787:panel.spacing = unit(1.5, "lines")
+1743854093788:)
+1743854094726:ggsave("min_max_scaling.png",
+1743854094726:width = 20,
+1743854094726:height = height,
+1743854094726:units = "in",
+1743854094726:dpi = 300,
+1743854094726:limitsize = FALSE)

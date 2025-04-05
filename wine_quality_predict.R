@@ -337,8 +337,8 @@ ggplot(comparison_all, aes(x = Value, fill = Type)) +
   theme_minimal(base_size = 22) + 
   theme(
     legend.position = "bottom",
-    legend.text = element_text(size = 10),
-    axis.text.x = element_text(angle = 0, hjust = 1, size = 10),
+    legend.text = element_text(size = 22),
+    axis.text.x = element_text(angle = 0, hjust = 1, size = 22),
     axis.text.y = element_text(size = 22),
     axis.title = element_text(size = 22), 
     strip.text = element_text(size = 22, face = "bold"),
