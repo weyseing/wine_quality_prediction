@@ -2443,3 +2443,1476 @@
 1743848708587:height = height,
 1743848708587:units = "in",
 1743848708588:dpi = 300)
+1743849067153:# library
+1743849067153:# install.packages("dplyr")
+1743849067153:# install.packages("e1071")
+1743849067154:# install.packages("gridExtra")
+1743849067154:# install.packages("ggplot2")
+1743849067154:# install.packages("VIM")
+1743849067154:# install.packages("mice")
+1743849067154:# install.packages("caret")
+1743849067154:# install.packages("randomForest")
+1743849067154:# install.packages("GGally")
+1743849067154:# install.packages("plotly")
+1743849067154:# install.packages("tidyverse")
+1743849067154:library(dplyr)
+1743849067154:library(e1071)
+1743849067155:library(gridExtra)
+1743849067155:library(ggplot2)
+1743849067155:library(VIM)
+1743849067155:library(mice)
+1743849067155:library(caret)
+1743849067156:library(randomForest)
+1743849067156:library(GGally)
+1743849067156:library(plotly)
+1743849067156:library(tidyr)
+1743849067157:library(dplyr)
+1743849067157:library(tidyverse)
+1743849067157:# seed
+1743849067157:set.seed(123)
+1743849067158:# dataset
+1743849067158:winequality <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv", sep = ";")
+1743849068544:tail(winequality, n=3)
+1743849068548:# summary
+1743849068548:summary(winequality)
+1743849068558:# === OUTLIER HANDLING ===
+1743849068558:# check outlier
+1743849068558:png("outlier_check_before.png", width = 1200, height = 400)
+1743849068561:par(mfrow = c(1, 3))
+1743849068561:outlier_vars <- c("residual.sugar", "chlorides", "total.sulfur.dioxide")
+1743849068561:for (var in outlier_vars) {
+1743849068561:boxplot(winequality[[var]],
+1743849068561:main = paste(var, "Distribution"),
+1743849068561:ylab = var)
+1743849068562:}
+1743849068575:dev.off()
+1743849068595:# IQR
+1743849068595:detect_outliers <- function(x) {
+1743849068595:Q1 <- quantile(x, 0.25, na.rm = TRUE)
+1743849068595:Q3 <- quantile(x, 0.75, na.rm = TRUE)
+1743849068596:IQR <- Q3 - Q1
+1743849068596:lower_bound <- Q1 - 1.5 * IQR
+1743849068596:upper_bound <- Q3 + 1.5 * IQR
+1743849068596:return(list(lower = lower_bound, upper = upper_bound))
+1743849068596:}
+1743849068596:# winsorize outliers
+1743849068596:winsorize_iqr <- function(x) {
+1743849068596:bounds <- detect_outliers(x)
+1743849068597:x[x < bounds$lower] <- bounds$lower
+1743849068597:x[x > bounds$upper] <- bounds$upper
+1743849068597:return(x)
+1743849068597:}
+1743849068597:winequality <- winequality %>%
+1743849068597:mutate(across(all_of(outlier_vars), ~ winsorize_iqr(.x)))
+1743849068612:tail(winequality, n=3)
+1743849068615:summary(winequality)
+1743849068622:# check outlier
+1743849068622:png("outlier_check_after.png", width = 1200, height = 400)
+1743849068623:par(mfrow = c(1, 3))
+1743849068623:outlier_vars <- c("residual.sugar", "chlorides", "total.sulfur.dioxide")
+1743849068623:for (var in outlier_vars) {
+1743849068623:boxplot(winequality[[var]],
+1743849068623:main = paste(var, "Distribution"),
+1743849068623:ylab = var)
+1743849068624:}
+1743849068633:dev.off()
+1743849068652:# === LOG TRANSFORMATION ===
+1743849068652:# calc skewness
+1743849068652:numeric_vars <- names(winequality)[sapply(winequality, is.numeric)]
+1743849068653:skewness_report <- data.frame(
+1743849068653:Variable = numeric_vars,
+1743849068653:Skewness = round(sapply(winequality[, numeric_vars], skewness), 2)
+1743849068653:)
+1743849068657:skewness_report <- skewness_report[order(-abs(skewness_report$Skewness)), ]
+1743849068657:print("Skewness Report (Before Transformation):")
+1743849068657:print(skewness_report)
+1743849068659:high_skew_vars <- skewness_report %>%
+1743849068659:filter(Skewness > 1) %>%
+1743849068659:pull(Variable)
+1743849068661:# check skewness
+1743849068661:original_plots <- lapply(high_skew_vars, function(var) {
+1743849068661:skew_val <- round(skewness(winequality[[var]]), 2)
+1743849068662:ggplot(winequality, aes_string(var)) +
+1743849068662:geom_histogram(bins = 30, fill = "lightblue", color = "black") +
+1743849068662:geom_vline(aes(xintercept = mean(winequality[[var]])),
+1743849068662:color = "red", linetype = "dashed") +
+1743849068662:annotate("text", x = Inf, y = Inf,
+1743849068662:label = paste("Skewness:", skew_val),
+1743849068662:hjust = 1.2, vjust = 1.2, size = 4) +
+1743849068663:ggtitle(paste("Original", var)) +
+1743849068663:theme_minimal()
+1743849068663:})
+1743849068704:# log transformation
+1743849068704:winequality <- winequality %>%
+1743849068705:mutate(across(all_of(outlier_vars), ~ log1p(.x)))
+1743849068708:# check skewness
+1743849068708:transformed_plots <- lapply(outlier_vars, function(var) {
+1743849068708:skew_val <- round(skewness(winequality[[var]]), 2)
+1743849068708:ggplot(winequality, aes(x = .data[[var]])) +
+1743849068708:geom_histogram(bins = 30, fill = "lightgreen", color = "black") +
+1743849068708:geom_vline(aes(xintercept = mean(.data[[var]])),
+1743849068708:color = "darkgreen", linetype = "dashed") +
+1743849068708:annotate("text", x = Inf, y = Inf,
+1743849068708:label = paste("Skewness:", skew_val),
+1743849068708:hjust = 1.2, vjust = 1.2, size = 4) +
+1743849068709:ggtitle(paste("Transformed", var)) +
+1743849068709:theme_minimal()
+1743849068709:})
+1743849068753:# display plots
+1743849068753:ggsave(
+1743849068754:"log_transformation.png",
+1743849068754:arrangeGrob(grobs = combined_plots, ncol = 3, nrow = 2),
+1743849068754:width = 14, height = 8
+1743849068754:)
+1743849069717:# === MISSING VALUE HANDLING ====
+1743849069717:# check missing
+1743849069717:sum(is.na(winequality))
+1743849069718:# introduce missing value
+1743849069718:winequality_missing <- winequality
+1743849069718:predictor_vars <- setdiff(names(winequality_missing), "quality")
+1743849069718:for (col in predictor_vars) {
+1743849069719:if (is.numeric(winequality_missing[[col]])) {
+1743849069719:winequality_missing[[col]][sample(1:nrow(winequality_missing), 1000)] <- NA
+1743849069719:}
+1743849069719:}
+1743849069725:# missing report
+1743849069726:missing_report <- data.frame(
+1743849069726:Variable = names(winequality_missing),
+1743849069726:Missing = sapply(winequality_missing, function(x) sum(is.na(x))),
+1743849069726:Percent = round(sapply(winequality_missing, function(x) mean(is.na(x)))*100, 2)
+1743849069726:)
+1743849069729:print("Missing Value Report:")
+1743849069730:print(missing_report)
+1743849069731:# mean imputation
+1743849069732:method1 <- mice(
+1743849069732:winequality_missing,
+1743849069732:method = "mean",  # Correct method name for mean imputation
+1743849069732:m = 1,
+1743849069732:maxit = 1,
+1743849069732:printFlag = FALSE
+1743849069732:)
+1743849069839:winequality_mean <- complete(method1)
+1743849069842:# KNN imputation
+1743849069842:method2 <- mice(
+1743849069842:winequality_missing,
+1743849069842:method = "pmm",
+1743849069842:m = 1,
+1743849069842:maxit = 1,
+1743849069843:printFlag = FALSE
+1743849069843:)
+1743849069961:winequality_knn <- complete(method2)
+1743849069971:# compare imputation
+1743849069971:compare_imputation <- function(original, method1, method2, var) {
+1743849069971:# Original distribution
+1743849069971:p1 <- ggplot(data.frame(value = original[[var]]), aes(x = value)) +
+1743849069971:geom_density(color = "blue", fill = "blue", alpha = 0.3) +
+1743849069972:ggtitle("Original Distribution")
+1743849069972:# mean imputation
+1743849069972:p2 <- ggplot(data.frame(value = method1[[var]]), aes(x = value)) +
+1743849069972:geom_density(color = "red", fill = "red", alpha = 0.3) +
+1743849069972:ggtitle("Mean Imputation")
+1743849069972:# KNN imputation
+1743849069972:p3 <- ggplot(data.frame(value = method2[[var]]), aes(x = value)) +
+1743849069972:geom_density(color = "green", fill = "green", alpha = 0.3) +
+1743849069972:ggtitle("K-NN Imputation")
+1743849069973:grid.arrange(p1, p2, p3, ncol = 3)
+1743849069973:}
+1743849069973:png("missing_handling_1.png", width = 1200, height = 800, res = 150)
+1743849069974:compare_imputation(winequality, winequality_mean, winequality_knn, "residual.sugar")
+1743849070236:dev.off()
+1743849070279:compare_violin <- function(original, method1, method2, var) {
+1743849070279:df <- data.frame(
+1743849070279:Value = c(original[[var]], method1[[var]], method2[[var]]),
+1743849070279:Type = c(rep("Original", nrow(original)),
+1743849070279:rep("Imputed", nrow(method1)*2)),
+1743849070279:Method = c(rep("Original", nrow(original)),
+1743849070279:rep("Mean", nrow(method1)),
+1743849070280:rep("K-NN", nrow(method2)))
+1743849070280:)
+1743849070280:ggplot(df, aes(x = Method, y = Value, fill = Type)) +
+1743849070280:geom_violin(alpha = 0.5, trim = FALSE) +
+1743849070280:geom_jitter(aes(color = Type), width = 0.2, alpha = 0.3) +
+1743849070280:ggtitle(paste("Distribution Comparison for", var)) +
+1743849070280:theme_minimal()
+1743849070281:}
+1743849070281:png("missing_handling_2.png", width = 1200, height = 800, res = 150)
+1743849070281:compare_violin(winequality, winequality_mean, winequality_knn, "residual.sugar")
+1743849070759:dev.off()
+1743849070842:# === TRAIN-TEST SPLIT, MIN-MAX SCALING ===
+1743849070842:data <- winequality_knn
+1743849070842:split_ratios <- list(
+1743849070843:"70-30" = 0.7,
+1743849070843:"80-20" = 0.8,
+1743849070843:"90-10" = 0.9
+1743849070843:)
+1743849070843:results <- data.frame()
+1743849070843:for (split_name in names(split_ratios)) {
+1743849070844:ratio <- split_ratios[[split_name]]
+1743849070844:# split data
+1743849070844:trainIndex <- createDataPartition(data$quality, p = ratio, list = FALSE)
+1743849070844:train_data <- data[trainIndex, ]
+1743849070844:test_data <- data[-trainIndex, ]
+1743849070844:# min-max scaling
+1743849070845:preproc <- preProcess(train_data[, -which(names(train_data) == "quality")], method = "range")
+1743849070845:train_scaled <- predict(preproc, train_data)
+1743849070845:test_scaled <- predict(preproc, test_data)
+1743849070845:# modeling
+1743849070845:model <- randomForest(
+1743849070846:x = train_scaled[, -which(names(train_scaled) == "quality")],
+1743849070846:y = train_scaled$quality,
+1743849070846:ntree = 100,
+1743849070846:importance = TRUE
+1743849070846:)
+1743849070847:# predict
+1743849070847:predictions <- predict(model, test_scaled[, -which(names(test_scaled) == "quality")])
+1743849070847:# metrics
+1743849070847:rmse <- sqrt(mean((predictions - test_data$quality)^2))
+1743849070848:mae <- mean(abs(predictions - test_data$quality))
+1743849070848:r_squared <- cor(predictions, test_data$quality)^2
+1743849070848:results <- rbind(results, data.frame(
+1743849070848:Split = split_name,  # Use split_name directly
+1743849070849:RMSE = round(rmse, 2),
+1743849070849:MAE = round(mae, 2),
+1743849070849:R_Squared = round(r_squared, 2),
+1743849070849:Train_Size = nrow(train_data),
+1743849070850:Test_Size = nrow(test_data)
+1743849070850:))
+1743849070850:}
+1743849077492:# RMSE
+1743849077493:print("Model Performance Across Splits:")
+1743849077493:print(results)
+1743849077494:png("RMSE.png", width = 1200, height = 800, res = 150)
+1743849077495:ggplot(results, aes(x = Split, y = RMSE, fill = Split)) +
+1743849077495:geom_bar(stat = "identity") +
+1743849077495:geom_text(aes(label = RMSE), vjust = -0.5) +
+1743849077495:labs(title = "Model Performance Comparison (RMSE)",
+1743849077495:y = "Root Mean Squared Error",
+1743849077495:x = "Train-Test Split Ratio") +
+1743849077496:theme_minimal()
+1743849077623:dev.off()
+1743849077659:# === VISUALIZE MIN-MAX SCALE ===
+1743849077659:comparison_all <- predictor_vars %>%
+1743849077659:map_dfr(~{
+1743849077660:tibble(
+1743849077660:Feature = .x,
+1743849077660:Original = train_data[[.x]],   # From original data
+1743849077660:Scaled = train_scaled[[.x]]    # From scaled data
+1743849077660:) %>%
+1743849077660:pivot_longer(cols = c(Original, Scaled),
+1743849077660:names_to = "Type",
+1743849077660:values_to = "Value")
+1743849077660:})
+1743849077707:# layout
+1743849077708:n_features <- length(predictor_vars)
+1743849077708:n_rows <- ceiling(n_features / 2)
+1743849077708:height <- max(8, n_rows * 2.5)
+1743849077708:ggplot(comparison_all, aes(x = Value, fill = Type)) +
+1743849077708:geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+1743849077708:# min/max lines
+1743849077708:geom_vline(data = summary_all,
+1743849077708:aes(xintercept = Min, color = Type),
+1743849077708:linetype = "dashed") +
+1743849077708:geom_vline(data = summary_all,
+1743849077708:aes(xintercept = Max, color = Type),
+1743849077709:linetype = "dashed") +
+1743849077709:# Facet grid
+1743849077709:facet_wrap(~ Feature,
+1743849077709:scales = "free",
+1743849077709:ncol = 2,
+1743849077709:labeller = label_wrap_gen(width = 25)) +
+1743849077709:# color & style
+1743849077709:scale_fill_manual(values = c("Original" = "lightblue", "Scaled" = "lightgreen")) +
+1743849077709:scale_color_manual(values = c("Original" = "blue", "Scaled" = "green")) +
+1743849077709:labs(title = "Min-Max Scaling Effects Across All Features",
+1743849077709:subtitle = "Blue: Original | Green: Scaled [0,1]",
+1743849077710:x = "Value",
+1743849077710:y = "Count") +
+1743849077710:theme_minimal() +
+1743849077710:theme(
+1743849077710:legend.position = "bottom",
+1743849077710:axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
+1743849077710:strip.text = element_text(size = 9, face = "bold"),
+1743849077710:panel.spacing = unit(1.5, "lines"),  # Increased spacing between panels
+1743849077710:plot.title = element_text(size = 14),
+1743849077711:plot.subtitle = element_text(size = 11)
+1743849077711:)
+1743849078443:# Save with appropriate dimensions
+1743849078444:ggsave("min_max_scaling.png",
+1743849078444:width = 16,
+1743849078444:height = height,
+1743849078444:units = "in",
+1743849078444:dpi = 300)
+1743849548052:# library
+1743849548052:install.packages("dplyr")
+1743849548060:install.packages("e1071")
+1743849552967:install.packages("gridExtra")
+1743849555988:install.packages("ggplot2")
+1743849555989:install.packages("VIM")
+1743849556041:install.packages("mice")
+1743849556086:install.packages("caret")
+1743849556160:install.packages("randomForest")
+1743849558427:install.packages("GGally")
+1743849560602:install.packages("plotly")
+1743849562978:install.packages("tidyverse")
+1743849563036:library(dplyr)
+1743849563043:library(e1071)
+1743849563085:library(gridExtra)
+1743849563098:library(ggplot2)
+1743849563109:library(VIM)
+1743849564285:library(mice)
+1743849564648:library(caret)
+1743849565135:library(randomForest)
+1743849565151:library(GGally)
+1743849565178:library(plotly)
+1743849565248:library(tidyr)
+1743849565257:library(dplyr)
+1743849565258:library(tidyverse)
+1743849565479:# seed
+1743849565479:set.seed(123)
+1743849565479:# dataset
+1743849565479:winequality <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv", sep = ";")
+1743849566752:tail(winequality, n=3)
+1743849566759:# summary
+1743849566760:summary(winequality)
+1743849566777:# === OUTLIER HANDLING ===
+1743849566777:# check outlier
+1743849566777:png("outlier_check_before.png", width = 1200, height = 400)
+1743849566787:par(mfrow = c(1, 3))
+1743849566787:outlier_vars <- c("residual.sugar", "chlorides", "total.sulfur.dioxide")
+1743849566787:for (var in outlier_vars) {
+1743849566787:boxplot(winequality[[var]],
+1743849566788:main = paste(var, "Distribution"),
+1743849566788:ylab = var)
+1743849566788:}
+1743849566817:dev.off()
+1743849566837:# IQR
+1743849566837:detect_outliers <- function(x) {
+1743849566837:Q1 <- quantile(x, 0.25, na.rm = TRUE)
+1743849566837:Q3 <- quantile(x, 0.75, na.rm = TRUE)
+1743849566837:IQR <- Q3 - Q1
+1743849566837:lower_bound <- Q1 - 1.5 * IQR
+1743849566837:upper_bound <- Q3 + 1.5 * IQR
+1743849566837:return(list(lower = lower_bound, upper = upper_bound))
+1743849566837:}
+1743849566837:# winsorize outliers
+1743849566838:winsorize_iqr <- function(x) {
+1743849566838:bounds <- detect_outliers(x)
+1743849566838:x[x < bounds$lower] <- bounds$lower
+1743849566838:x[x > bounds$upper] <- bounds$upper
+1743849566838:return(x)
+1743849566838:}
+1743849566838:winequality <- winequality %>%
+1743849566838:mutate(across(all_of(outlier_vars), ~ winsorize_iqr(.x)))
+1743849566865:tail(winequality, n=3)
+1743849566867:summary(winequality)
+1743849566874:# check outlier
+1743849566874:png("outlier_check_after.png", width = 1200, height = 400)
+1743849566874:par(mfrow = c(1, 3))
+1743849566874:outlier_vars <- c("residual.sugar", "chlorides", "total.sulfur.dioxide")
+1743849566875:for (var in outlier_vars) {
+1743849566875:boxplot(winequality[[var]],
+1743849566875:main = paste(var, "Distribution"),
+1743849566875:ylab = var)
+1743849566875:}
+1743849566885:dev.off()
+1743849566910:# === LOG TRANSFORMATION ===
+1743849566910:# calc skewness
+1743849566910:numeric_vars <- names(winequality)[sapply(winequality, is.numeric)]
+1743849566911:skewness_report <- data.frame(
+1743849566911:Variable = numeric_vars,
+1743849566911:Skewness = round(sapply(winequality[, numeric_vars], skewness), 2)
+1743849566911:)
+1743849566914:skewness_report <- skewness_report[order(-abs(skewness_report$Skewness)), ]
+1743849566914:print("Skewness Report (Before Transformation):")
+1743849566914:print(skewness_report)
+1743849566916:high_skew_vars <- skewness_report %>%
+1743849566916:filter(Skewness > 1) %>%
+1743849566916:pull(Variable)
+1743849566919:# check skewness
+1743849566919:original_plots <- lapply(high_skew_vars, function(var) {
+1743849566919:skew_val <- round(skewness(winequality[[var]]), 2)
+1743849566919:ggplot(winequality, aes_string(var)) +
+1743849566920:geom_histogram(bins = 30, fill = "lightblue", color = "black") +
+1743849566920:geom_vline(aes(xintercept = mean(winequality[[var]])),
+1743849566920:color = "red", linetype = "dashed") +
+1743849566920:annotate("text", x = Inf, y = Inf,
+1743849566920:label = paste("Skewness:", skew_val),
+1743849566920:hjust = 1.2, vjust = 1.2, size = 4) +
+1743849566920:ggtitle(paste("Original", var)) +
+1743849566921:theme_minimal()
+1743849566921:})
+1743849567057:# log transformation
+1743849567058:winequality <- winequality %>%
+1743849567058:mutate(across(all_of(outlier_vars), ~ log1p(.x)))
+1743849567061:# check skewness
+1743849567061:transformed_plots <- lapply(outlier_vars, function(var) {
+1743849567062:skew_val <- round(skewness(winequality[[var]]), 2)
+1743849567062:ggplot(winequality, aes(x = .data[[var]])) +
+1743849567062:geom_histogram(bins = 30, fill = "lightgreen", color = "black") +
+1743849567062:geom_vline(aes(xintercept = mean(.data[[var]])),
+1743849567062:color = "darkgreen", linetype = "dashed") +
+1743849567062:annotate("text", x = Inf, y = Inf,
+1743849567063:label = paste("Skewness:", skew_val),
+1743849567063:hjust = 1.2, vjust = 1.2, size = 4) +
+1743849567063:ggtitle(paste("Transformed", var)) +
+1743849567063:theme_minimal()
+1743849567063:})
+1743849567102:# display plots
+1743849567102:ggsave(
+1743849567102:"log_transformation.png",
+1743849567102:arrangeGrob(grobs = combined_plots, ncol = 3, nrow = 2),
+1743849567102:width = 14, height = 8
+1743849567102:)
+1743849568188:# === MISSING VALUE HANDLING ====
+1743849568188:# check missing
+1743849568188:sum(is.na(winequality))
+1743849568188:# introduce missing value
+1743849568188:winequality_missing <- winequality
+1743849568189:predictor_vars <- setdiff(names(winequality_missing), "quality")
+1743849568189:for (col in predictor_vars) {
+1743849568189:if (is.numeric(winequality_missing[[col]])) {
+1743849568189:winequality_missing[[col]][sample(1:nrow(winequality_missing), 1000)] <- NA
+1743849568189:}
+1743849568190:}
+1743849568197:# missing report
+1743849568197:missing_report <- data.frame(
+1743849568197:Variable = names(winequality_missing),
+1743849568197:Missing = sapply(winequality_missing, function(x) sum(is.na(x))),
+1743849568197:Percent = round(sapply(winequality_missing, function(x) mean(is.na(x)))*100, 2)
+1743849568197:)
+1743849568201:print("Missing Value Report:")
+1743849568201:print(missing_report)
+1743849568204:# mean imputation
+1743849568204:method1 <- mice(
+1743849568204:winequality_missing,
+1743849568204:method = "mean",  # Correct method name for mean imputation
+1743849568204:m = 1,
+1743849568204:maxit = 1,
+1743849568204:printFlag = FALSE
+1743849568204:)
+1743849568307:winequality_mean <- complete(method1)
+1743849568310:# KNN imputation
+1743849568310:method2 <- mice(
+1743849568310:winequality_missing,
+1743849568311:method = "pmm",
+1743849568311:m = 1,
+1743849568311:maxit = 1,
+1743849568311:printFlag = FALSE
+1743849568311:)
+1743849568438:winequality_knn <- complete(method2)
+1743849568440:# compare imputation
+1743849568440:compare_imputation <- function(original, method1, method2, var) {
+1743849568440:# Original distribution
+1743849568441:p1 <- ggplot(data.frame(value = original[[var]]), aes(x = value)) +
+1743849568441:geom_density(color = "blue", fill = "blue", alpha = 0.3) +
+1743849568441:ggtitle("Original Distribution")
+1743849568441:# mean imputation
+1743849568441:p2 <- ggplot(data.frame(value = method1[[var]]), aes(x = value)) +
+1743849568441:geom_density(color = "red", fill = "red", alpha = 0.3) +
+1743849568441:ggtitle("Mean Imputation")
+1743849568441:# KNN imputation
+1743849568442:p3 <- ggplot(data.frame(value = method2[[var]]), aes(x = value)) +
+1743849568442:geom_density(color = "green", fill = "green", alpha = 0.3) +
+1743849568442:ggtitle("K-NN Imputation")
+1743849568442:grid.arrange(p1, p2, p3, ncol = 3)
+1743849568442:}
+1743849568442:png("missing_handling_1.png", width = 1200, height = 800, res = 150)
+1743849568443:compare_imputation(winequality, winequality_mean, winequality_knn, "residual.sugar")
+1743849568805:dev.off()
+1743849568847:compare_violin <- function(original, method1, method2, var) {
+1743849568848:df <- data.frame(
+1743849568848:Value = c(original[[var]], method1[[var]], method2[[var]]),
+1743849568848:Type = c(rep("Original", nrow(original)),
+1743849568848:rep("Imputed", nrow(method1)*2)),
+1743849568848:Method = c(rep("Original", nrow(original)),
+1743849568848:rep("Mean", nrow(method1)),
+1743849568848:rep("K-NN", nrow(method2)))
+1743849568849:)
+1743849568849:ggplot(df, aes(x = Method, y = Value, fill = Type)) +
+1743849568849:geom_violin(alpha = 0.5, trim = FALSE) +
+1743849568849:geom_jitter(aes(color = Type), width = 0.2, alpha = 0.3) +
+1743849568849:ggtitle(paste("Distribution Comparison for", var)) +
+1743849568849:theme_minimal()
+1743849568849:}
+1743849568850:png("missing_handling_2.png", width = 1200, height = 800, res = 150)
+1743849568850:compare_violin(winequality, winequality_mean, winequality_knn, "residual.sugar")
+1743849569480:dev.off()
+1743849569554:# === TRAIN-TEST SPLIT, MIN-MAX SCALING ===
+1743849569554:data <- winequality_knn
+1743849569554:split_ratios <- list(
+1743849569554:"70-30" = 0.7,
+1743849569554:"80-20" = 0.8,
+1743849569555:"90-10" = 0.9
+1743849569555:)
+1743849569555:results <- data.frame()
+1743849569555:for (split_name in names(split_ratios)) {
+1743849569555:ratio <- split_ratios[[split_name]]
+1743849569555:# split data
+1743849569556:trainIndex <- createDataPartition(data$quality, p = ratio, list = FALSE)
+1743849569556:train_data <- data[trainIndex, ]
+1743849569556:test_data <- data[-trainIndex, ]
+1743849569556:# min-max scaling
+1743849569556:preproc <- preProcess(train_data[, -which(names(train_data) == "quality")], method = "range")
+1743849569556:train_scaled <- predict(preproc, train_data)
+1743849569556:test_scaled <- predict(preproc, test_data)
+1743849569557:# modeling
+1743849569557:model <- randomForest(
+1743849569557:x = train_scaled[, -which(names(train_scaled) == "quality")],
+1743849569557:y = train_scaled$quality,
+1743849569557:ntree = 100,
+1743849569557:importance = TRUE
+1743849569557:)
+1743849569558:# predict
+1743849569558:predictions <- predict(model, test_scaled[, -which(names(test_scaled) == "quality")])
+1743849569558:# metrics
+1743849569558:rmse <- sqrt(mean((predictions - test_data$quality)^2))
+1743849569558:mae <- mean(abs(predictions - test_data$quality))
+1743849569559:r_squared <- cor(predictions, test_data$quality)^2
+1743849569559:results <- rbind(results, data.frame(
+1743849569559:Split = split_name,  # Use split_name directly
+1743849569559:RMSE = round(rmse, 2),
+1743849569559:MAE = round(mae, 2),
+1743849569560:R_Squared = round(r_squared, 2),
+1743849569560:Train_Size = nrow(train_data),
+1743849569560:Test_Size = nrow(test_data)
+1743849569560:))
+1743849569560:}
+1743849576809:# RMSE
+1743849576809:print("Model Performance Across Splits:")
+1743849576809:print(results)
+1743849576811:png("RMSE.png", width = 1200, height = 800, res = 150)
+1743849576811:ggplot(results, aes(x = Split, y = RMSE, fill = Split)) +
+1743849576812:geom_bar(stat = "identity") +
+1743849576812:geom_text(aes(label = RMSE), vjust = -0.5) +
+1743849576812:labs(title = "Model Performance Comparison (RMSE)",
+1743849576812:y = "Root Mean Squared Error",
+1743849576812:x = "Train-Test Split Ratio") +
+1743849576812:theme_minimal()
+1743849577064:dev.off()
+1743849577101:# === VISUALIZE MIN-MAX SCALE ===
+1743849577101:comparison_all <- predictor_vars %>%
+1743849577101:map_dfr(~{
+1743849577101:tibble(
+1743849577101:Feature = .x,
+1743849577101:Original = train_data[[.x]],   # From original data
+1743849577101:Scaled = train_scaled[[.x]]    # From scaled data
+1743849577102:) %>%
+1743849577102:pivot_longer(cols = c(Original, Scaled),
+1743849577102:names_to = "Type",
+1743849577102:values_to = "Value")
+1743849577102:})
+1743849577175:# layout
+1743849577176:n_features <- length(predictor_vars)
+1743849577176:n_rows <- ceiling(n_features / 2)
+1743849577176:height <- max(8, n_rows * 2.5)
+1743849577176:ggplot(comparison_all, aes(x = Value, fill = Type)) +
+1743849577176:geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+1743849577176:# min/max lines
+1743849577176:geom_vline(data = summary_all,
+1743849577177:aes(xintercept = Min, color = Type),
+1743849577177:linetype = "dashed") +
+1743849577177:geom_vline(data = summary_all,
+1743849577177:aes(xintercept = Max, color = Type),
+1743849577177:linetype = "dashed") +
+1743849577177:# Facet grid
+1743849577178:facet_wrap(~ Feature,
+1743849577178:scales = "free",
+1743849577178:ncol = 2,
+1743849577178:labeller = label_wrap_gen(width = 25)) +
+1743849577178:# color & style
+1743849577179:scale_fill_manual(values = c("Original" = "lightblue", "Scaled" = "lightgreen")) +
+1743849577179:scale_color_manual(values = c("Original" = "blue", "Scaled" = "green")) +
+1743849577179:labs(title = "Min-Max Scaling Effects Across All Features",
+1743849577179:subtitle = "Blue: Original | Green: Scaled [0,1]",
+1743849577179:x = "Value",
+1743849577180:y = "Count") +
+1743849577180:theme_minimal() +
+1743849577180:theme(
+1743849577180:legend.position = "bottom",
+1743849577180:axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
+1743849577180:strip.text = element_text(size = 9, face = "bold"),
+1743849577181:panel.spacing = unit(1.5, "lines"),  # Increased spacing between panels
+1743849577181:plot.title = element_text(size = 14),
+1743849577181:plot.subtitle = element_text(size = 11)
+1743849577181:)
+1743849577910:# Save with appropriate dimensions
+1743849577911:ggsave("min_max_scaling.png",
+1743849577911:width = 16,
+1743849577911:height = height,
+1743849577911:units = "in",
+1743849577911:dpi = 300)
+1743849579703:install.packages("dplyr")
+1743849582307:install.packages("caret")
+1743849582308:install.packages("mice")
+1743849582310:install.packages("VIM")
+1743849582311:install.packages("ggplot2")
+1743849582312:install.packages("tidyverse")
+1743849583876:install.packages("tidyverse")
+1743849585890:install.packages("ggplot2")
+1743849588505:install.packages("VIM")
+1743849588506:install.packages("mice")
+1743849588507:install.packages("caret")
+1743849593665:install.packages("caret")
+1743849595918:install.packages("mice")
+1743849597947:install.packages("VIM")
+1743849599986:install.packages("VIM")
+1743849620816:# library
+1743849620816:install.packages("dplyr")
+1743849620818:install.packages("e1071")
+1743849620820:install.packages("gridExtra")
+1743849620821:install.packages("ggplot2")
+1743849620827:install.packages("VIM")
+1743849620828:install.packages("mice")
+1743849620829:install.packages("caret")
+1743849620830:install.packages("randomForest")
+1743849620831:install.packages("GGally")
+1743849620832:install.packages("plotly")
+1743849620833:install.packages("tidyverse")
+1743849620835:library(dplyr)
+1743849620835:library(e1071)
+1743849620835:library(gridExtra)
+1743849620835:library(ggplot2)
+1743849620836:library(VIM)
+1743849620836:library(mice)
+1743849620836:library(caret)
+1743849620836:library(randomForest)
+1743849620837:library(GGally)
+1743849620837:library(plotly)
+1743849620837:library(tidyr)
+1743849620837:library(dplyr)
+1743849620838:library(tidyverse)
+1743849620838:# seed
+1743849620838:set.seed(123)
+1743849620838:# dataset
+1743849620838:winequality <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv", sep = ";")
+1743849622147:tail(winequality, n=3)
+1743849622153:# summary
+1743849622153:summary(winequality)
+1743849622167:# === OUTLIER HANDLING ===
+1743849622168:# check outlier
+1743849622168:png("outlier_check_before.png", width = 1200, height = 400)
+1743849622168:par(mfrow = c(1, 3))
+1743849622169:outlier_vars <- c("residual.sugar", "chlorides", "total.sulfur.dioxide")
+1743849622169:for (var in outlier_vars) {
+1743849622169:boxplot(winequality[[var]],
+1743849622169:main = paste(var, "Distribution"),
+1743849622169:ylab = var)
+1743849622169:}
+1743849622181:dev.off()
+1743849622200:# IQR
+1743849622200:detect_outliers <- function(x) {
+1743849622200:Q1 <- quantile(x, 0.25, na.rm = TRUE)
+1743849622200:Q3 <- quantile(x, 0.75, na.rm = TRUE)
+1743849622200:IQR <- Q3 - Q1
+1743849622200:lower_bound <- Q1 - 1.5 * IQR
+1743849622200:upper_bound <- Q3 + 1.5 * IQR
+1743849622201:return(list(lower = lower_bound, upper = upper_bound))
+1743849622201:}
+1743849622201:# winsorize outliers
+1743849622201:winsorize_iqr <- function(x) {
+1743849622201:bounds <- detect_outliers(x)
+1743849622201:x[x < bounds$lower] <- bounds$lower
+1743849622201:x[x > bounds$upper] <- bounds$upper
+1743849622201:return(x)
+1743849622202:}
+1743849622202:winequality <- winequality %>%
+1743849622202:mutate(across(all_of(outlier_vars), ~ winsorize_iqr(.x)))
+1743849622244:tail(winequality, n=3)
+1743849622246:summary(winequality)
+1743849622253:# check outlier
+1743849622253:png("outlier_check_after.png", width = 1200, height = 400)
+1743849622253:par(mfrow = c(1, 3))
+1743849622253:outlier_vars <- c("residual.sugar", "chlorides", "total.sulfur.dioxide")
+1743849622254:for (var in outlier_vars) {
+1743849622254:boxplot(winequality[[var]],
+1743849622254:main = paste(var, "Distribution"),
+1743849622254:ylab = var)
+1743849622254:}
+1743849622262:dev.off()
+1743849622281:# === LOG TRANSFORMATION ===
+1743849622281:# calc skewness
+1743849622281:numeric_vars <- names(winequality)[sapply(winequality, is.numeric)]
+1743849622281:skewness_report <- data.frame(
+1743849622281:Variable = numeric_vars,
+1743849622281:Skewness = round(sapply(winequality[, numeric_vars], skewness), 2)
+1743849622282:)
+1743849622284:skewness_report <- skewness_report[order(-abs(skewness_report$Skewness)), ]
+1743849622284:print("Skewness Report (Before Transformation):")
+1743849622284:print(skewness_report)
+1743849622286:high_skew_vars <- skewness_report %>%
+1743849622286:filter(Skewness > 1) %>%
+1743849622286:pull(Variable)
+1743849622287:# check skewness
+1743849622287:original_plots <- lapply(high_skew_vars, function(var) {
+1743849622288:skew_val <- round(skewness(winequality[[var]]), 2)
+1743849622288:ggplot(winequality, aes_string(var)) +
+1743849622288:geom_histogram(bins = 30, fill = "lightblue", color = "black") +
+1743849622288:geom_vline(aes(xintercept = mean(winequality[[var]])),
+1743849622288:color = "red", linetype = "dashed") +
+1743849622288:annotate("text", x = Inf, y = Inf,
+1743849622288:label = paste("Skewness:", skew_val),
+1743849622288:hjust = 1.2, vjust = 1.2, size = 4) +
+1743849622288:ggtitle(paste("Original", var)) +
+1743849622288:theme_minimal()
+1743849622288:})
+1743849622331:# log transformation
+1743849622331:winequality <- winequality %>%
+1743849622331:mutate(across(all_of(outlier_vars), ~ log1p(.x)))
+1743849622336:# check skewness
+1743849622336:transformed_plots <- lapply(outlier_vars, function(var) {
+1743849622336:skew_val <- round(skewness(winequality[[var]]), 2)
+1743849622336:ggplot(winequality, aes(x = .data[[var]])) +
+1743849622336:geom_histogram(bins = 30, fill = "lightgreen", color = "black") +
+1743849622337:geom_vline(aes(xintercept = mean(.data[[var]])),
+1743849622337:color = "darkgreen", linetype = "dashed") +
+1743849622337:annotate("text", x = Inf, y = Inf,
+1743849622337:label = paste("Skewness:", skew_val),
+1743849622337:hjust = 1.2, vjust = 1.2, size = 4) +
+1743849622337:ggtitle(paste("Transformed", var)) +
+1743849622338:theme_minimal()
+1743849622338:})
+1743849622376:# display plots
+1743849622376:combined_plots <- c(original_plots, transformed_plots)
+1743849622377:ggsave(
+1743849622377:"log_transformation.png",
+1743849622377:arrangeGrob(grobs = combined_plots, ncol = 3, nrow = 2),
+1743849622377:width = 14, height = 8
+1743849622377:)
+1743849623356:# === MISSING VALUE HANDLING ====
+1743849623356:# check missing
+1743849623356:sum(is.na(winequality))
+1743849623357:# introduce missing value
+1743849623357:winequality_missing <- winequality
+1743849623357:predictor_vars <- setdiff(names(winequality_missing), "quality")
+1743849623357:for (col in predictor_vars) {
+1743849623358:if (is.numeric(winequality_missing[[col]])) {
+1743849623358:winequality_missing[[col]][sample(1:nrow(winequality_missing), 1000)] <- NA
+1743849623358:}
+1743849623358:}
+1743849623364:# missing report
+1743849623364:missing_report <- data.frame(
+1743849623364:Variable = names(winequality_missing),
+1743849623364:Missing = sapply(winequality_missing, function(x) sum(is.na(x))),
+1743849623364:Percent = round(sapply(winequality_missing, function(x) mean(is.na(x)))*100, 2)
+1743849623364:)
+1743849623368:print("Missing Value Report:")
+1743849623368:print(missing_report)
+1743849623370:# mean imputation
+1743849623371:method1 <- mice(
+1743849623371:winequality_missing,
+1743849623371:method = "mean",  # Correct method name for mean imputation
+1743849623371:m = 1,
+1743849623371:maxit = 1,
+1743849623371:printFlag = FALSE
+1743849623371:)
+1743849623470:winequality_mean <- complete(method1)
+1743849623473:# KNN imputation
+1743849623473:method2 <- mice(
+1743849623473:winequality_missing,
+1743849623473:method = "pmm",
+1743849623473:m = 1,
+1743849623473:maxit = 1,
+1743849623474:printFlag = FALSE
+1743849623474:)
+1743849623589:winequality_knn <- complete(method2)
+1743849623591:# compare imputation
+1743849623591:compare_imputation <- function(original, method1, method2, var) {
+1743849623591:# Original distribution
+1743849623592:p1 <- ggplot(data.frame(value = original[[var]]), aes(x = value)) +
+1743849623592:geom_density(color = "blue", fill = "blue", alpha = 0.3) +
+1743849623592:ggtitle("Original Distribution")
+1743849623592:# mean imputation
+1743849623592:p2 <- ggplot(data.frame(value = method1[[var]]), aes(x = value)) +
+1743849623592:geom_density(color = "red", fill = "red", alpha = 0.3) +
+1743849623593:ggtitle("Mean Imputation")
+1743849623593:# KNN imputation
+1743849623593:p3 <- ggplot(data.frame(value = method2[[var]]), aes(x = value)) +
+1743849623593:geom_density(color = "green", fill = "green", alpha = 0.3) +
+1743849623593:ggtitle("K-NN Imputation")
+1743849623593:grid.arrange(p1, p2, p3, ncol = 3)
+1743849623593:}
+1743849623594:png("missing_handling_1.png", width = 1200, height = 800, res = 150)
+1743849623594:compare_imputation(winequality, winequality_mean, winequality_knn, "residual.sugar")
+1743849623857:dev.off()
+1743849623899:compare_violin <- function(original, method1, method2, var) {
+1743849623899:df <- data.frame(
+1743849623899:Value = c(original[[var]], method1[[var]], method2[[var]]),
+1743849623899:Type = c(rep("Original", nrow(original)),
+1743849623899:rep("Imputed", nrow(method1)*2)),
+1743849623900:Method = c(rep("Original", nrow(original)),
+1743849623900:rep("Mean", nrow(method1)),
+1743849623900:rep("K-NN", nrow(method2)))
+1743849623900:)
+1743849623900:ggplot(df, aes(x = Method, y = Value, fill = Type)) +
+1743849623900:geom_violin(alpha = 0.5, trim = FALSE) +
+1743849623900:geom_jitter(aes(color = Type), width = 0.2, alpha = 0.3) +
+1743849623900:ggtitle(paste("Distribution Comparison for", var)) +
+1743849623900:theme_minimal()
+1743849623901:}
+1743849623901:png("missing_handling_2.png", width = 1200, height = 800, res = 150)
+1743849623901:compare_violin(winequality, winequality_mean, winequality_knn, "residual.sugar")
+1743849624401:dev.off()
+1743849624485:# === TRAIN-TEST SPLIT, MIN-MAX SCALING ===
+1743849624485:data <- winequality_knn
+1743849624485:split_ratios <- list(
+1743849624485:"70-30" = 0.7,
+1743849624485:"80-20" = 0.8,
+1743849624485:"90-10" = 0.9
+1743849624485:)
+1743849624486:results <- data.frame()
+1743849624486:for (split_name in names(split_ratios)) {
+1743849624486:ratio <- split_ratios[[split_name]]
+1743849624486:# split data
+1743849624486:trainIndex <- createDataPartition(data$quality, p = ratio, list = FALSE)
+1743849624487:train_data <- data[trainIndex, ]
+1743849624487:test_data <- data[-trainIndex, ]
+1743849624487:# min-max scaling
+1743849624487:preproc <- preProcess(train_data[, -which(names(train_data) == "quality")], method = "range")
+1743849624487:train_scaled <- predict(preproc, train_data)
+1743849624488:test_scaled <- predict(preproc, test_data)
+1743849624488:# modeling
+1743849624488:model <- randomForest(
+1743849624488:x = train_scaled[, -which(names(train_scaled) == "quality")],
+1743849624488:y = train_scaled$quality,
+1743849624489:ntree = 100,
+1743849624489:importance = TRUE
+1743849624489:)
+1743849624489:# predict
+1743849624489:predictions <- predict(model, test_scaled[, -which(names(test_scaled) == "quality")])
+1743849624490:# metrics
+1743849624490:rmse <- sqrt(mean((predictions - test_data$quality)^2))
+1743849624490:mae <- mean(abs(predictions - test_data$quality))
+1743849624490:r_squared <- cor(predictions, test_data$quality)^2
+1743849624491:results <- rbind(results, data.frame(
+1743849624491:Split = split_name,  # Use split_name directly
+1743849624491:RMSE = round(rmse, 2),
+1743849624491:MAE = round(mae, 2),
+1743849624491:R_Squared = round(r_squared, 2),
+1743849624492:Train_Size = nrow(train_data),
+1743849624492:Test_Size = nrow(test_data)
+1743849624492:))
+1743849624492:}
+1743849631076:# RMSE
+1743849631076:print("Model Performance Across Splits:")
+1743849631076:print(results)
+1743849631078:png("RMSE.png", width = 1200, height = 800, res = 150)
+1743849631078:ggplot(results, aes(x = Split, y = RMSE, fill = Split)) +
+1743849631079:geom_bar(stat = "identity") +
+1743849631079:geom_text(aes(label = RMSE), vjust = -0.5) +
+1743849631079:labs(title = "Model Performance Comparison (RMSE)",
+1743849631079:y = "Root Mean Squared Error",
+1743849631079:x = "Train-Test Split Ratio") +
+1743849631079:theme_minimal()
+1743849631183:dev.off()
+1743849631217:# === VISUALIZE MIN-MAX SCALE ===
+1743849631217:comparison_all <- predictor_vars %>%
+1743849631217:map_dfr(~{
+1743849631217:tibble(
+1743849631217:Feature = .x,
+1743849631217:Original = train_data[[.x]],   # From original data
+1743849631217:Scaled = train_scaled[[.x]]    # From scaled data
+1743849631217:) %>%
+1743849631217:pivot_longer(cols = c(Original, Scaled),
+1743849631218:names_to = "Type",
+1743849631218:values_to = "Value")
+1743849631218:})
+1743849631264:# layout
+1743849631264:n_features <- length(predictor_vars)
+1743849631264:n_rows <- ceiling(n_features / 2)
+1743849631264:height <- max(8, n_rows * 2.5)
+1743849631264:ggplot(comparison_all, aes(x = Value, fill = Type)) +
+1743849631264:geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+1743849631264:# min/max lines
+1743849631264:geom_vline(data = summary_all,
+1743849631264:aes(xintercept = Min, color = Type),
+1743849631265:linetype = "dashed") +
+1743849631265:geom_vline(data = summary_all,
+1743849631265:aes(xintercept = Max, color = Type),
+1743849631265:linetype = "dashed") +
+1743849631265:# Facet grid
+1743849631265:facet_wrap(~ Feature,
+1743849631265:scales = "free",
+1743849631265:ncol = 2,
+1743849631265:labeller = label_wrap_gen(width = 25)) +
+1743849631265:# color & style
+1743849631265:scale_fill_manual(values = c("Original" = "lightblue", "Scaled" = "lightgreen")) +
+1743849631265:scale_color_manual(values = c("Original" = "blue", "Scaled" = "green")) +
+1743849631266:labs(title = "Min-Max Scaling Effects Across All Features",
+1743849631266:subtitle = "Blue: Original | Green: Scaled [0,1]",
+1743849631266:x = "Value",
+1743849631266:y = "Count") +
+1743849631266:theme_minimal() +
+1743849631266:theme(
+1743849631266:legend.position = "bottom",
+1743849631266:axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
+1743849631266:strip.text = element_text(size = 9, face = "bold"),
+1743849631266:panel.spacing = unit(1.5, "lines"),  # Increased spacing between panels
+1743849631267:plot.title = element_text(size = 14),
+1743849631267:plot.subtitle = element_text(size = 11)
+1743849631267:)
+1743849632022:# Save with appropriate dimensions
+1743849632022:ggsave("min_max_scaling.png",
+1743849632022:width = 16,
+1743849632022:height = height,
+1743849632022:units = "in",
+1743849632022:dpi = 300)
+1743849633802:install.packages("tidyverse")
+1743849636664:install.packages("plotly")
+1743849636665:install.packages("GGally")
+1743849636666:install.packages("randomForest")
+1743849636667:install.packages("caret")
+1743849636668:install.packages("mice")
+1743849636669:install.packages("VIM")
+1743849636670:install.packages("ggplot2")
+1743849636671:install.packages("gridExtra")
+1743849636672:install.packages("e1071")
+1743849636673:install.packages("dplyr")
+1743849640409:install.packages("dplyr")
+1743849642808:install.packages("e1071")
+1743849644701:install.packages("gridExtra")
+1743849644702:install.packages("ggplot2")
+1743849644703:install.packages("VIM")
+1743849644704:install.packages("mice")
+1743849644705:install.packages("caret")
+1743849644706:install.packages("randomForest")
+1743849644707:install.packages("GGally")
+1743849644708:install.packages("plotly")
+1743849645986:install.packages("plotly")
+1743849648880:install.packages("GGally")
+1743849651235:install.packages("randomForest")
+1743849651237:install.packages("caret")
+1743849651238:install.packages("mice")
+1743849651239:install.packages("VIM")
+1743849651240:install.packages("ggplot2")
+1743849651240:install.packages("gridExtra")
+1743849653930:install.packages("gridExtra")
+1743849656176:install.packages("ggplot2")
+1743849658697:install.packages("VIM")
+1743849658698:install.packages("mice")
+1743849658699:install.packages("caret")
+1743849658700:install.packages("randomForest")
+1743849660007:install.packages("randomForest")
+1743849662380:install.packages("caret")
+1743849664759:install.packages("mice")
+1743849664761:install.packages("VIM")
+1743849667307:install.packages("VIM")
+1743849670077:install.packages("mice")
+1743849716567:library(dplyr)
+1743849716568:library(e1071)
+1743849716568:library(gridExtra)
+1743849716569:library(ggplot2)
+1743849716569:library(VIM)
+1743849716570:library(mice)
+1743849716570:library(caret)
+1743849716571:library(randomForest)
+1743849716571:library(GGally)
+1743849716571:library(plotly)
+1743849716572:library(tidyr)
+1743849716572:library(dplyr)
+1743849716572:library(tidyverse)
+1743849716575:# seed
+1743849716575:set.seed(123)
+1743849716576:# dataset
+1743849716576:winequality <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv", sep = ";")
+1743849717992:tail(winequality, n=3)
+1743849717996:# summary
+1743849717996:summary(winequality)
+1743849718004:# === OUTLIER HANDLING ===
+1743849718004:# check outlier
+1743849718004:png("outlier_check_before.png", width = 1200, height = 400)
+1743849718005:par(mfrow = c(1, 3))
+1743849718006:outlier_vars <- c("residual.sugar", "chlorides", "total.sulfur.dioxide")
+1743849718006:for (var in outlier_vars) {
+1743849718006:boxplot(winequality[[var]],
+1743849718006:main = paste(var, "Distribution"),
+1743849718006:ylab = var)
+1743849718006:}
+1743849718116:dev.off()
+1743849718136:# IQR
+1743849718137:detect_outliers <- function(x) {
+1743849718137:Q1 <- quantile(x, 0.25, na.rm = TRUE)
+1743849718137:Q3 <- quantile(x, 0.75, na.rm = TRUE)
+1743849718137:IQR <- Q3 - Q1
+1743849718137:lower_bound <- Q1 - 1.5 * IQR
+1743849718137:upper_bound <- Q3 + 1.5 * IQR
+1743849718137:return(list(lower = lower_bound, upper = upper_bound))
+1743849718138:}
+1743849718138:# winsorize outliers
+1743849718138:winsorize_iqr <- function(x) {
+1743849718138:bounds <- detect_outliers(x)
+1743849718138:x[x < bounds$lower] <- bounds$lower
+1743849718138:x[x > bounds$upper] <- bounds$upper
+1743849718138:return(x)
+1743849718139:}
+1743849718139:winequality <- winequality %>%
+1743849718139:mutate(across(all_of(outlier_vars), ~ winsorize_iqr(.x)))
+1743849718155:tail(winequality, n=3)
+1743849718157:summary(winequality)
+1743849718165:# check outlier
+1743849718165:png("outlier_check_after.png", width = 1200, height = 400)
+1743849718165:par(mfrow = c(1, 3))
+1743849718165:outlier_vars <- c("residual.sugar", "chlorides", "total.sulfur.dioxide")
+1743849718166:for (var in outlier_vars) {
+1743849718166:boxplot(winequality[[var]],
+1743849718166:main = paste(var, "Distribution"),
+1743849718166:ylab = var)
+1743849718166:}
+1743849718176:dev.off()
+1743849718195:# === LOG TRANSFORMATION ===
+1743849718195:# calc skewness
+1743849718195:numeric_vars <- names(winequality)[sapply(winequality, is.numeric)]
+1743849718195:skewness_report <- data.frame(
+1743849718195:Variable = numeric_vars,
+1743849718196:Skewness = round(sapply(winequality[, numeric_vars], skewness), 2)
+1743849718196:)
+1743849718198:skewness_report <- skewness_report[order(-abs(skewness_report$Skewness)), ]
+1743849718199:print("Skewness Report (Before Transformation):")
+1743849718199:print(skewness_report)
+1743849718200:high_skew_vars <- skewness_report %>%
+1743849718201:filter(Skewness > 1) %>%
+1743849718201:pull(Variable)
+1743849718203:# check skewness
+1743849718203:original_plots <- lapply(high_skew_vars, function(var) {
+1743849718203:skew_val <- round(skewness(winequality[[var]]), 2)
+1743849718203:ggplot(winequality, aes_string(var)) +
+1743849718203:geom_histogram(bins = 30, fill = "lightblue", color = "black") +
+1743849718203:geom_vline(aes(xintercept = mean(winequality[[var]])),
+1743849718204:color = "red", linetype = "dashed") +
+1743849718204:annotate("text", x = Inf, y = Inf,
+1743849718204:label = paste("Skewness:", skew_val),
+1743849718204:hjust = 1.2, vjust = 1.2, size = 4) +
+1743849718204:ggtitle(paste("Original", var)) +
+1743849718204:theme_minimal()
+1743849718204:})
+1743849718252:# log transformation
+1743849718252:winequality <- winequality %>%
+1743849718252:mutate(across(all_of(outlier_vars), ~ log1p(.x)))
+1743849718257:# check skewness
+1743849718257:transformed_plots <- lapply(outlier_vars, function(var) {
+1743849718257:skew_val <- round(skewness(winequality[[var]]), 2)
+1743849718257:ggplot(winequality, aes(x = .data[[var]])) +
+1743849718257:geom_histogram(bins = 30, fill = "lightgreen", color = "black") +
+1743849718258:geom_vline(aes(xintercept = mean(.data[[var]])),
+1743849718258:color = "darkgreen", linetype = "dashed") +
+1743849718258:annotate("text", x = Inf, y = Inf,
+1743849718258:label = paste("Skewness:", skew_val),
+1743849718258:hjust = 1.2, vjust = 1.2, size = 4) +
+1743849718258:ggtitle(paste("Transformed", var)) +
+1743849718258:theme_minimal()
+1743849718258:})
+1743849718300:# display plots
+1743849718300:combined_plots <- c(original_plots, transformed_plots)
+1743849718300:ggsave(
+1743849718300:"log_transformation.png",
+1743849718300:arrangeGrob(grobs = combined_plots, ncol = 3, nrow = 2),
+1743849718300:width = 14, height = 8
+1743849718300:)
+1743849719370:# === MISSING VALUE HANDLING ====
+1743849719370:# check missing
+1743849719370:sum(is.na(winequality))
+1743849719371:# introduce missing value
+1743849719371:winequality_missing <- winequality
+1743849719371:predictor_vars <- setdiff(names(winequality_missing), "quality")
+1743849719371:for (col in predictor_vars) {
+1743849719372:if (is.numeric(winequality_missing[[col]])) {
+1743849719372:winequality_missing[[col]][sample(1:nrow(winequality_missing), 1000)] <- NA
+1743849719372:}
+1743849719372:}
+1743849719379:# missing report
+1743849719379:missing_report <- data.frame(
+1743849719379:Variable = names(winequality_missing),
+1743849719379:Missing = sapply(winequality_missing, function(x) sum(is.na(x))),
+1743849719379:Percent = round(sapply(winequality_missing, function(x) mean(is.na(x)))*100, 2)
+1743849719379:)
+1743849719383:print("Missing Value Report:")
+1743849719383:print(missing_report)
+1743849719385:# mean imputation
+1743849719385:method1 <- mice(
+1743849719385:winequality_missing,
+1743849719385:method = "mean",  # Correct method name for mean imputation
+1743849719386:m = 1,
+1743849719386:maxit = 1,
+1743849719386:printFlag = FALSE
+1743849719386:)
+1743849719477:winequality_mean <- complete(method1)
+1743849719479:# KNN imputation
+1743849719479:method2 <- mice(
+1743849719479:winequality_missing,
+1743849719479:method = "pmm",
+1743849719479:m = 1,
+1743849719479:maxit = 1,
+1743849719480:printFlag = FALSE
+1743849719480:)
+1743849719620:winequality_knn <- complete(method2)
+1743849719624:# compare imputation
+1743849719624:compare_imputation <- function(original, method1, method2, var) {
+1743849719624:# Original distribution
+1743849719624:p1 <- ggplot(data.frame(value = original[[var]]), aes(x = value)) +
+1743849719624:geom_density(color = "blue", fill = "blue", alpha = 0.3) +
+1743849719624:ggtitle("Original Distribution")
+1743849719624:# mean imputation
+1743849719624:p2 <- ggplot(data.frame(value = method1[[var]]), aes(x = value)) +
+1743849719625:geom_density(color = "red", fill = "red", alpha = 0.3) +
+1743849719625:ggtitle("Mean Imputation")
+1743849719625:# KNN imputation
+1743849719625:p3 <- ggplot(data.frame(value = method2[[var]]), aes(x = value)) +
+1743849719625:geom_density(color = "green", fill = "green", alpha = 0.3) +
+1743849719625:ggtitle("K-NN Imputation")
+1743849719625:grid.arrange(p1, p2, p3, ncol = 3)
+1743849719625:}
+1743849719626:png("missing_handling_1.png", width = 1200, height = 800, res = 150)
+1743849719626:compare_imputation(winequality, winequality_mean, winequality_knn, "residual.sugar")
+1743849719913:dev.off()
+1743849719958:compare_violin <- function(original, method1, method2, var) {
+1743849719958:df <- data.frame(
+1743849719958:Value = c(original[[var]], method1[[var]], method2[[var]]),
+1743849719958:Type = c(rep("Original", nrow(original)),
+1743849719958:rep("Imputed", nrow(method1)*2)),
+1743849719959:Method = c(rep("Original", nrow(original)),
+1743849719959:rep("Mean", nrow(method1)),
+1743849719959:rep("K-NN", nrow(method2)))
+1743849719959:)
+1743849719959:ggplot(df, aes(x = Method, y = Value, fill = Type)) +
+1743849719959:geom_violin(alpha = 0.5, trim = FALSE) +
+1743849719959:geom_jitter(aes(color = Type), width = 0.2, alpha = 0.3) +
+1743849719959:ggtitle(paste("Distribution Comparison for", var)) +
+1743849719959:theme_minimal()
+1743849719960:}
+1743849719960:png("missing_handling_2.png", width = 1200, height = 800, res = 150)
+1743849719961:compare_violin(winequality, winequality_mean, winequality_knn, "residual.sugar")
+1743849720506:dev.off()
+1743849720584:# === TRAIN-TEST SPLIT, MIN-MAX SCALING ===
+1743849720584:data <- winequality_knn
+1743849720585:split_ratios <- list(
+1743849720585:"70-30" = 0.7,
+1743849720585:"80-20" = 0.8,
+1743849720585:"90-10" = 0.9
+1743849720585:)
+1743849720585:results <- data.frame()
+1743849720585:for (split_name in names(split_ratios)) {
+1743849720586:ratio <- split_ratios[[split_name]]
+1743849720586:# split data
+1743849720586:trainIndex <- createDataPartition(data$quality, p = ratio, list = FALSE)
+1743849720586:train_data <- data[trainIndex, ]
+1743849720586:test_data <- data[-trainIndex, ]
+1743849720587:# min-max scaling
+1743849720587:preproc <- preProcess(train_data[, -which(names(train_data) == "quality")], method = "range")
+1743849720587:train_scaled <- predict(preproc, train_data)
+1743849720588:test_scaled <- predict(preproc, test_data)
+1743849720588:# modeling
+1743849720588:model <- randomForest(
+1743849720589:x = train_scaled[, -which(names(train_scaled) == "quality")],
+1743849720589:y = train_scaled$quality,
+1743849720589:ntree = 100,
+1743849720589:importance = TRUE
+1743849720589:)
+1743849720590:# predict
+1743849720590:predictions <- predict(model, test_scaled[, -which(names(test_scaled) == "quality")])
+1743849720590:# metrics
+1743849720590:rmse <- sqrt(mean((predictions - test_data$quality)^2))
+1743849720591:mae <- mean(abs(predictions - test_data$quality))
+1743849720591:r_squared <- cor(predictions, test_data$quality)^2
+1743849720591:results <- rbind(results, data.frame(
+1743849720591:Split = split_name,  # Use split_name directly
+1743849720592:RMSE = round(rmse, 2),
+1743849720592:MAE = round(mae, 2),
+1743849720592:R_Squared = round(r_squared, 2),
+1743849720592:Train_Size = nrow(train_data),
+1743849720592:Test_Size = nrow(test_data)
+1743849720593:))
+1743849720593:}
+1743849832983:library(dplyr)
+1743849833016:library(e1071)
+1743849833083:library(gridExtra)
+1743849833111:library(ggplot2)
+1743849833131:library(VIM)
+1743849834751:library(mice)
+1743849835153:library(caret)
+1743849835946:library(randomForest)
+1743849835969:library(GGally)
+1743849835981:library(plotly)
+1743849836059:library(tidyr)
+1743849836092:library(dplyr)
+1743849836092:library(tidyverse)
+1743849836482:# seed
+1743849836482:set.seed(123)
+1743849836483:# dataset
+1743849836483:winequality <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv", sep = ";")
+1743849838025:tail(winequality, n=3)
+1743849838060:# summary
+1743849838060:summary(winequality)
+1743849838076:# === OUTLIER HANDLING ===
+1743849838076:# check outlier
+1743849838077:png("outlier_check_before.png", width = 1200, height = 400)
+1743849838086:par(mfrow = c(1, 3))
+1743849838086:outlier_vars <- c("residual.sugar", "chlorides", "total.sulfur.dioxide")
+1743849838086:for (var in outlier_vars) {
+1743849838086:boxplot(winequality[[var]],
+1743849838086:main = paste(var, "Distribution"),
+1743849838086:ylab = var)
+1743849838086:}
+1743849838118:dev.off()
+1743849838138:# IQR
+1743849838138:detect_outliers <- function(x) {
+1743849838138:Q1 <- quantile(x, 0.25, na.rm = TRUE)
+1743849838138:Q3 <- quantile(x, 0.75, na.rm = TRUE)
+1743849838138:IQR <- Q3 - Q1
+1743849838138:lower_bound <- Q1 - 1.5 * IQR
+1743849838138:upper_bound <- Q3 + 1.5 * IQR
+1743849838138:return(list(lower = lower_bound, upper = upper_bound))
+1743849838138:}
+1743849838139:# winsorize outliers
+1743849838139:winsorize_iqr <- function(x) {
+1743849838139:bounds <- detect_outliers(x)
+1743849838139:x[x < bounds$lower] <- bounds$lower
+1743849838139:x[x > bounds$upper] <- bounds$upper
+1743849838139:return(x)
+1743849838139:}
+1743849838139:winequality <- winequality %>%
+1743849838139:mutate(across(all_of(outlier_vars), ~ winsorize_iqr(.x)))
+1743849838188:tail(winequality, n=3)
+1743849838191:summary(winequality)
+1743849838197:# check outlier
+1743849838198:png("outlier_check_after.png", width = 1200, height = 400)
+1743849838198:par(mfrow = c(1, 3))
+1743849838198:outlier_vars <- c("residual.sugar", "chlorides", "total.sulfur.dioxide")
+1743849838198:for (var in outlier_vars) {
+1743849838198:boxplot(winequality[[var]],
+1743849838198:main = paste(var, "Distribution"),
+1743849838198:ylab = var)
+1743849838199:}
+1743849838209:dev.off()
+1743849838232:# === LOG TRANSFORMATION ===
+1743849838232:# calc skewness
+1743849838233:numeric_vars <- names(winequality)[sapply(winequality, is.numeric)]
+1743849838233:skewness_report <- data.frame(
+1743849838233:Variable = numeric_vars,
+1743849838233:Skewness = round(sapply(winequality[, numeric_vars], skewness), 2)
+1743849838233:)
+1743849838236:skewness_report <- skewness_report[order(-abs(skewness_report$Skewness)), ]
+1743849838237:print("Skewness Report (Before Transformation):")
+1743849838237:print(skewness_report)
+1743849838238:high_skew_vars <- skewness_report %>%
+1743849838238:filter(Skewness > 1) %>%
+1743849838238:pull(Variable)
+1743849838241:# check skewness
+1743849838241:original_plots <- lapply(high_skew_vars, function(var) {
+1743849838241:skew_val <- round(skewness(winequality[[var]]), 2)
+1743849838241:ggplot(winequality, aes_string(var)) +
+1743849838242:geom_histogram(bins = 30, fill = "lightblue", color = "black") +
+1743849838242:geom_vline(aes(xintercept = mean(winequality[[var]])),
+1743849838242:color = "red", linetype = "dashed") +
+1743849838242:annotate("text", x = Inf, y = Inf,
+1743849838242:label = paste("Skewness:", skew_val),
+1743849838242:hjust = 1.2, vjust = 1.2, size = 4) +
+1743849838242:ggtitle(paste("Original", var)) +
+1743849838242:theme_minimal()
+1743849838242:})
+1743849838376:# log transformation
+1743849838376:winequality <- winequality %>%
+1743849838376:mutate(across(all_of(outlier_vars), ~ log1p(.x)))
+1743849838379:# check skewness
+1743849838380:transformed_plots <- lapply(outlier_vars, function(var) {
+1743849838380:skew_val <- round(skewness(winequality[[var]]), 2)
+1743849838380:ggplot(winequality, aes(x = .data[[var]])) +
+1743849838380:geom_histogram(bins = 30, fill = "lightgreen", color = "black") +
+1743849838380:geom_vline(aes(xintercept = mean(.data[[var]])),
+1743849838380:color = "darkgreen", linetype = "dashed") +
+1743849838380:annotate("text", x = Inf, y = Inf,
+1743849838380:label = paste("Skewness:", skew_val),
+1743849838380:hjust = 1.2, vjust = 1.2, size = 4) +
+1743849838380:ggtitle(paste("Transformed", var)) +
+1743849838381:theme_minimal()
+1743849838381:})
+1743849838436:# display plots
+1743849838436:combined_plots <- c(original_plots, transformed_plots)
+1743849838437:ggsave(
+1743849838437:"log_transformation.png",
+1743849838437:arrangeGrob(grobs = combined_plots, ncol = 3, nrow = 2),
+1743849838437:width = 14, height = 8
+1743849838437:)
+1743849839663:# === MISSING VALUE HANDLING ====
+1743849839663:# check missing
+1743849839663:sum(is.na(winequality))
+1743849839664:# introduce missing value
+1743849839664:winequality_missing <- winequality
+1743849839664:predictor_vars <- setdiff(names(winequality_missing), "quality")
+1743849839664:for (col in predictor_vars) {
+1743849839664:if (is.numeric(winequality_missing[[col]])) {
+1743849839664:winequality_missing[[col]][sample(1:nrow(winequality_missing), 1000)] <- NA
+1743849839664:}
+1743849839664:}
+1743849839671:# missing report
+1743849839671:missing_report <- data.frame(
+1743849839671:Variable = names(winequality_missing),
+1743849839672:Missing = sapply(winequality_missing, function(x) sum(is.na(x))),
+1743849839672:Percent = round(sapply(winequality_missing, function(x) mean(is.na(x)))*100, 2)
+1743849839672:)
+1743849839676:print("Missing Value Report:")
+1743849839676:print(missing_report)
+1743849839678:# mean imputation
+1743849839678:method1 <- mice(
+1743849839678:winequality_missing,
+1743849839678:method = "mean",  # Correct method name for mean imputation
+1743849839678:m = 1,
+1743849839678:maxit = 1,
+1743849839678:printFlag = FALSE
+1743849839678:)
+1743849839830:winequality_mean <- complete(method1)
+1743849839834:# KNN imputation
+1743849839834:method2 <- mice(
+1743849839834:winequality_missing,
+1743849839835:method = "pmm",
+1743849839835:m = 1,
+1743849839835:maxit = 1,
+1743849839835:printFlag = FALSE
+1743849839835:)
+1743849840325:winequality_knn <- complete(method2)
+1743849840328:# compare imputation
+1743849840328:compare_imputation <- function(original, method1, method2, var) {
+1743849840328:# Original distribution
+1743849840328:p1 <- ggplot(data.frame(value = original[[var]]), aes(x = value)) +
+1743849840328:geom_density(color = "blue", fill = "blue", alpha = 0.3) +
+1743849840328:ggtitle("Original Distribution")
+1743849840329:# mean imputation
+1743849840329:p2 <- ggplot(data.frame(value = method1[[var]]), aes(x = value)) +
+1743849840329:geom_density(color = "red", fill = "red", alpha = 0.3) +
+1743849840329:ggtitle("Mean Imputation")
+1743849840329:# KNN imputation
+1743849840329:p3 <- ggplot(data.frame(value = method2[[var]]), aes(x = value)) +
+1743849840329:geom_density(color = "green", fill = "green", alpha = 0.3) +
+1743849840329:ggtitle("K-NN Imputation")
+1743849840329:grid.arrange(p1, p2, p3, ncol = 3)
+1743849840329:}
+1743849840330:png("missing_handling_1.png", width = 1200, height = 800, res = 150)
+1743849840330:compare_imputation(winequality, winequality_mean, winequality_knn, "residual.sugar")
+1743849840699:dev.off()
+1743849840743:compare_violin <- function(original, method1, method2, var) {
+1743849840743:df <- data.frame(
+1743849840743:Value = c(original[[var]], method1[[var]], method2[[var]]),
+1743849840743:Type = c(rep("Original", nrow(original)),
+1743849840743:rep("Imputed", nrow(method1)*2)),
+1743849840743:Method = c(rep("Original", nrow(original)),
+1743849840743:rep("Mean", nrow(method1)),
+1743849840743:rep("K-NN", nrow(method2)))
+1743849840744:)
+1743849840744:ggplot(df, aes(x = Method, y = Value, fill = Type)) +
+1743849840744:geom_violin(alpha = 0.5, trim = FALSE) +
+1743849840744:geom_jitter(aes(color = Type), width = 0.2, alpha = 0.3) +
+1743849840744:ggtitle(paste("Distribution Comparison for", var)) +
+1743849840744:theme_minimal()
+1743849840744:}
+1743849840745:png("missing_handling_2.png", width = 1200, height = 800, res = 150)
+1743849840746:compare_violin(winequality, winequality_mean, winequality_knn, "residual.sugar")
+1743849841337:dev.off()
+1743849841408:# === TRAIN-TEST SPLIT, MIN-MAX SCALING ===
+1743849841408:data <- winequality_knn
+1743849841408:split_ratios <- list(
+1743849841408:"70-30" = 0.7,
+1743849841408:"80-20" = 0.8,
+1743849841408:"90-10" = 0.9
+1743849841408:)
+1743849841409:results <- data.frame()
+1743849841409:for (split_name in names(split_ratios)) {
+1743849841409:ratio <- split_ratios[[split_name]]
+1743849841409:# split data
+1743849841409:trainIndex <- createDataPartition(data$quality, p = ratio, list = FALSE)
+1743849841409:train_data <- data[trainIndex, ]
+1743849841409:test_data <- data[-trainIndex, ]
+1743849841409:# min-max scaling
+1743849841409:preproc <- preProcess(train_data[, -which(names(train_data) == "quality")], method = "range")
+1743849841410:train_scaled <- predict(preproc, train_data)
+1743849841410:test_scaled <- predict(preproc, test_data)
+1743849841410:# modeling
+1743849841410:model <- randomForest(
+1743849841410:x = train_scaled[, -which(names(train_scaled) == "quality")],
+1743849841410:y = train_scaled$quality,
+1743849841410:ntree = 100,
+1743849841410:importance = TRUE
+1743849841410:)
+1743849841410:# predict
+1743849841411:predictions <- predict(model, test_scaled[, -which(names(test_scaled) == "quality")])
+1743849841411:# metrics
+1743849841411:rmse <- sqrt(mean((predictions - test_data$quality)^2))
+1743849841411:mae <- mean(abs(predictions - test_data$quality))
+1743849841411:r_squared <- cor(predictions, test_data$quality)^2
+1743849841411:results <- rbind(results, data.frame(
+1743849841411:Split = split_name,  # Use split_name directly
+1743849841411:RMSE = round(rmse, 2),
+1743849841412:MAE = round(mae, 2),
+1743849841412:R_Squared = round(r_squared, 2),
+1743849841412:Train_Size = nrow(train_data),
+1743849841412:Test_Size = nrow(test_data)
+1743849841412:))
+1743849841412:}
+1743849847872:# RMSE
+1743849847872:print("Model Performance Across Splits:")
+1743849847873:print(results)
+1743849847874:png("RMSE.png", width = 1200, height = 800, res = 150)
+1743849847875:ggplot(results, aes(x = Split, y = RMSE, fill = Split)) +
+1743849847875:geom_bar(stat = "identity") +
+1743849847875:geom_text(aes(label = RMSE), vjust = -0.5) +
+1743849847875:labs(title = "Model Performance Comparison (RMSE)",
+1743849847875:y = "Root Mean Squared Error",
+1743849847875:x = "Train-Test Split Ratio") +
+1743849847875:theme_minimal()
+1743849848118:dev.off()
+1743849848155:# === VISUALIZE MIN-MAX SCALE ===
+1743849848156:comparison_all <- predictor_vars %>%
+1743849848156:map_dfr(~{
+1743849848156:tibble(
+1743849848156:Feature = .x,
+1743849848156:Original = train_data[[.x]],   # From original data
+1743849848156:Scaled = train_scaled[[.x]]    # From scaled data
+1743849848156:) %>%
+1743849848156:pivot_longer(cols = c(Original, Scaled),
+1743849848156:names_to = "Type",
+1743849848156:values_to = "Value")
+1743849848156:})
+1743849848207:summary_all <- comparison_all %>%
+1743849848207:group_by(Feature, Type) %>%
+1743849848207:summarise(
+1743849848207:Min = min(Value),
+1743849848208:Max = max(Value),
+1743849848208:.groups = 'drop'
+1743849848208:)
+1743849848216:# layout
+1743849848216:n_features <- length(predictor_vars)
+1743849848216:n_rows <- ceiling(n_features / 2)
+1743849848216:height <- max(8, n_rows * 2.5)
+1743849848216:ggplot(comparison_all, aes(x = Value, fill = Type)) +
+1743849848217:geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+1743849848217:# min/max lines
+1743849848217:geom_vline(data = summary_all,
+1743849848217:aes(xintercept = Min, color = Type),
+1743849848217:linetype = "dashed") +
+1743849848217:geom_vline(data = summary_all,
+1743849848217:aes(xintercept = Max, color = Type),
+1743849848217:linetype = "dashed") +
+1743849848217:# Facet grid
+1743849848217:facet_wrap(~ Feature,
+1743849848217:scales = "free",
+1743849848217:ncol = 2,
+1743849848217:labeller = label_wrap_gen(width = 25)) +
+1743849848218:# color & style
+1743849848218:scale_fill_manual(values = c("Original" = "lightblue", "Scaled" = "lightgreen")) +
+1743849848218:scale_color_manual(values = c("Original" = "blue", "Scaled" = "green")) +
+1743849848218:labs(title = "Min-Max Scaling Effects Across All Features",
+1743849848218:subtitle = "Blue: Original | Green: Scaled [0,1]",
+1743849848218:x = "Value",
+1743849848218:y = "Count") +
+1743849848218:theme_minimal() +
+1743849848218:theme(
+1743849848218:legend.position = "bottom",
+1743849848219:axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
+1743849848219:strip.text = element_text(size = 9, face = "bold"),
+1743849848219:panel.spacing = unit(1.5, "lines"),  # Increased spacing between panels
+1743849848219:plot.title = element_text(size = 14),
+1743849848219:plot.subtitle = element_text(size = 11)
+1743849848219:)
+1743849849231:# Save with appropriate dimensions
+1743849849231:ggsave("min_max_scaling.png",
+1743849849231:width = 16,
+1743849849231:height = height,
+1743849849231:units = "in",
+1743849849231:dpi = 300)

@@ -1,15 +1,15 @@
 # library
-# install.packages("dplyr")
-# install.packages("e1071")
-# install.packages("gridExtra")
-# install.packages("ggplot2")
-# install.packages("VIM")
-# install.packages("mice")
-# install.packages("caret")
-# install.packages("randomForest")
-# install.packages("GGally")
-# install.packages("plotly")
-# install.packages("tidyverse")
+install.packages("dplyr")
+install.packages("e1071")
+install.packages("gridExtra")
+install.packages("ggplot2")
+install.packages("VIM")
+install.packages("mice")
+install.packages("caret")
+install.packages("randomForest")
+install.packages("GGally")
+install.packages("plotly")
+install.packages("tidyverse")
 library(dplyr)
 library(e1071)
 library(gridExtra)
@@ -132,6 +132,7 @@ transformed_plots <- lapply(outlier_vars, function(var) {
 })
 
 # display plots
+combined_plots <- c(original_plots, transformed_plots)
 ggsave(
   "log_transformation.png",
   arrangeGrob(grobs = combined_plots, ncol = 3, nrow = 2),
@@ -296,6 +297,13 @@ comparison_all <- predictor_vars %>%
                    names_to = "Type", 
                    values_to = "Value")
   })
+summary_all <- comparison_all %>%
+  group_by(Feature, Type) %>%
+  summarise(
+    Min = min(Value),
+    Max = max(Value),
+    .groups = 'drop'
+  )
 
 # layout
 n_features <- length(predictor_vars)

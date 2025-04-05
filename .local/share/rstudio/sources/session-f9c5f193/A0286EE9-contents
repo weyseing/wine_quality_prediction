@@ -1,0 +1,336 @@
+Installing package into ‘/usr/local/lib/R/site-library’
+(as ‘lib’ is unspecified)
+trying URL 'https://p3m.dev/cran/__linux__/noble/latest/src/contrib/dplyr_1.1.4.tar.gz'
+Content type 'binary/octet-stream' length 1491332 bytes (1.4 MB)
+==================================================
+downloaded 1.4 MB
+
+* installing *binary* package ‘dplyr’ ...
+* DONE (dplyr)
+
+The downloaded source packages are in
+	‘/tmp/RtmpBxzvoz/downloaded_packages’
+Installing package into ‘/usr/local/lib/R/site-library’
+(as ‘lib’ is unspecified)
+trying URL 'https://p3m.dev/cran/__linux__/noble/latest/src/contrib/e1071_1.7-16.tar.gz'
+Content type 'binary/octet-stream' length 596729 bytes (582 KB)
+==================================================
+downloaded 582 KB
+
+* installing *binary* package ‘e1071’ ...
+* DONE (e1071)
+
+The downloaded source packages are in
+	‘/tmp/RtmpBxzvoz/downloaded_packages’
+Installing package into ‘/usr/local/lib/R/site-library’
+(as ‘lib’ is unspecified)
+trying URL 'https://p3m.dev/cran/__linux__/noble/latest/src/contrib/gridExtra_2.3.tar.gz'
+Content type 'binary/octet-stream' length 1106795 bytes (1.1 MB)
+==================================================
+downloaded 1.1 MB
+
+* installing *binary* package ‘gridExtra’ ...
+* DONE (gridExtra)
+
+The downloaded source packages are in
+	‘/tmp/RtmpBxzvoz/downloaded_packages’
+Installing package into ‘/usr/local/lib/R/site-library’
+(as ‘lib’ is unspecified)
+trying URL 'https://p3m.dev/cran/__linux__/noble/latest/src/contrib/ggplot2_3.5.1.tar.gz'
+Content type 'binary/octet-stream' length 5005317 bytes (4.8 MB)
+==================================================
+downloaded 4.8 MB
+
+* installing *binary* package ‘ggplot2’ ...
+* DONE (ggplot2)
+
+The downloaded source packages are in
+	‘/tmp/RtmpBxzvoz/downloaded_packages’
+Installing package into ‘/usr/local/lib/R/site-library’
+(as ‘lib’ is unspecified)
+trying URL 'https://p3m.dev/cran/__linux__/noble/latest/src/contrib/VIM_6.2.2.tar.gz'
+Content type 'binary/octet-stream' length 2716065 bytes (2.6 MB)
+==================================================
+downloaded 2.6 MB
+
+* installing *binary* package ‘VIM’ ...
+* DONE (VIM)
+
+The downloaded source packages are in
+	‘/tmp/RtmpBxzvoz/downloaded_packages’
+Installing package into ‘/usr/local/lib/R/site-library’
+(as ‘lib’ is unspecified)
+trying URL 'https://p3m.dev/cran/__linux__/noble/latest/src/contrib/mice_3.17.0.tar.gz'
+Content type 'binary/octet-stream' length 1478527 bytes (1.4 MB)
+==================================================
+downloaded 1.4 MB
+
+* installing *binary* package ‘mice’ ...
+* DONE (mice)
+
+The downloaded source packages are in
+	‘/tmp/RtmpBxzvoz/downloaded_packages’
+Installing package into ‘/usr/local/lib/R/site-library’
+(as ‘lib’ is unspecified)
+trying URL 'https://p3m.dev/cran/__linux__/noble/latest/src/contrib/caret_7.0-1.tar.gz'
+Content type 'binary/octet-stream' length 3595322 bytes (3.4 MB)
+==================================================
+downloaded 3.4 MB
+
+* installing *binary* package ‘caret’ ...
+* DONE (caret)
+
+The downloaded source packages are in
+	‘/tmp/RtmpBxzvoz/downloaded_packages’
+Installing package into ‘/usr/local/lib/R/site-library’
+(as ‘lib’ is unspecified)
+trying URL 'https://p3m.dev/cran/__linux__/noble/latest/src/contrib/randomForest_4.7-1.2.tar.gz'
+Content type 'binary/octet-stream' length 218880 bytes (213 KB)
+==================================================
+downloaded 213 KB
+
+* installing *binary* package ‘randomForest’ ...
+* DONE (randomForest)
+
+The downloaded source packages are in
+	‘/tmp/RtmpBxzvoz/downloaded_packages’
+Installing package into ‘/usr/local/lib/R/site-library’
+(as ‘lib’ is unspecified)
+trying URL 'https://p3m.dev/cran/__linux__/noble/latest/src/contrib/GGally_2.2.1.tar.gz'
+Content type 'binary/octet-stream' length 1950908 bytes (1.9 MB)
+==================================================
+downloaded 1.9 MB
+
+* installing *binary* package ‘GGally’ ...
+* DONE (GGally)
+
+The downloaded source packages are in
+	‘/tmp/RtmpBxzvoz/downloaded_packages’
+Installing package into ‘/usr/local/lib/R/site-library’
+(as ‘lib’ is unspecified)
+trying URL 'https://p3m.dev/cran/__linux__/noble/latest/src/contrib/plotly_4.10.4.tar.gz'
+Content type 'binary/octet-stream' length 3174154 bytes (3.0 MB)
+==================================================
+downloaded 3.0 MB
+
+* installing *binary* package ‘plotly’ ...
+* DONE (plotly)
+
+The downloaded source packages are in
+	‘/tmp/RtmpBxzvoz/downloaded_packages’
+Installing package into ‘/usr/local/lib/R/site-library’
+(as ‘lib’ is unspecified)
+trying URL 'https://p3m.dev/cran/__linux__/noble/latest/src/contrib/tidyverse_2.0.0.tar.gz'
+Content type 'binary/octet-stream' length 425797 bytes (415 KB)
+==================================================
+downloaded 415 KB
+
+* installing *binary* package ‘tidyverse’ ...
+* DONE (tidyverse)
+
+The downloaded source packages are in
+	‘/tmp/RtmpBxzvoz/downloaded_packages’
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: ‘gridExtra’
+
+The following object is masked from ‘package:dplyr’:
+
+    combine
+
+Loading required package: colorspace
+Loading required package: grid
+VIM is ready to use.
+
+Suggestions and bug-reports can be submitted at: https://github.com/statistikat/VIM/issues
+
+Attaching package: ‘VIM’
+
+The following object is masked from ‘package:datasets’:
+
+    sleep
+
+
+Attaching package: ‘mice’
+
+The following object is masked from ‘package:stats’:
+
+    filter
+
+The following objects are masked from ‘package:base’:
+
+    cbind, rbind
+
+Loading required package: lattice
+randomForest 4.7-1.2
+Type rfNews() to see new features/changes/bug fixes.
+
+Attaching package: ‘randomForest’
+
+The following object is masked from ‘package:ggplot2’:
+
+    margin
+
+The following object is masked from ‘package:gridExtra’:
+
+    combine
+
+The following object is masked from ‘package:dplyr’:
+
+    combine
+
+Registered S3 method overwritten by 'GGally':
+  method from   
+  +.gg   ggplot2
+
+Attaching package: ‘plotly’
+
+The following object is masked from ‘package:ggplot2’:
+
+    last_plot
+
+The following object is masked from ‘package:stats’:
+
+    filter
+
+The following object is masked from ‘package:graphics’:
+
+    layout
+
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ forcats   1.0.0     ✔ readr     2.1.5
+✔ lubridate 1.9.4     ✔ stringr   1.5.1
+✔ purrr     1.0.4     ✔ tibble    3.2.1
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ randomForest::combine() masks gridExtra::combine(), dplyr::combine()
+✖ plotly::filter()        masks mice::filter(), dplyr::filter(), stats::filter()
+✖ dplyr::lag()            masks stats::lag()
+✖ purrr::lift()           masks caret::lift()
+✖ randomForest::margin()  masks ggplot2::margin()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+     fixed.acidity volatile.acidity citric.acid residual.sugar chlorides
+4896           6.5             0.24        0.19            1.2     0.041
+4897           5.5             0.29        0.30            1.1     0.022
+4898           6.0             0.21        0.38            0.8     0.020
+     free.sulfur.dioxide total.sulfur.dioxide density   pH sulphates alcohol
+4896                  30                  111 0.99254 2.99      0.46     9.4
+4897                  20                  110 0.98869 3.34      0.38    12.8
+4898                  22                   98 0.98941 3.26      0.32    11.8
+     quality
+4896       6
+4897       7
+4898       6
+ fixed.acidity    volatile.acidity  citric.acid     residual.sugar  
+ Min.   : 3.800   Min.   :0.0800   Min.   :0.0000   Min.   : 0.600  
+ 1st Qu.: 6.300   1st Qu.:0.2100   1st Qu.:0.2700   1st Qu.: 1.700  
+ Median : 6.800   Median :0.2600   Median :0.3200   Median : 5.200  
+ Mean   : 6.855   Mean   :0.2782   Mean   :0.3342   Mean   : 6.391  
+ 3rd Qu.: 7.300   3rd Qu.:0.3200   3rd Qu.:0.3900   3rd Qu.: 9.900  
+ Max.   :14.200   Max.   :1.1000   Max.   :1.6600   Max.   :65.800  
+   chlorides       free.sulfur.dioxide total.sulfur.dioxide    density      
+ Min.   :0.00900   Min.   :  2.00      Min.   :  9.0        Min.   :0.9871  
+ 1st Qu.:0.03600   1st Qu.: 23.00      1st Qu.:108.0        1st Qu.:0.9917  
+ Median :0.04300   Median : 34.00      Median :134.0        Median :0.9937  
+ Mean   :0.04577   Mean   : 35.31      Mean   :138.4        Mean   :0.9940  
+ 3rd Qu.:0.05000   3rd Qu.: 46.00      3rd Qu.:167.0        3rd Qu.:0.9961  
+ Max.   :0.34600   Max.   :289.00      Max.   :440.0        Max.   :1.0390  
+       pH          sulphates         alcohol         quality     
+ Min.   :2.720   Min.   :0.2200   Min.   : 8.00   Min.   :3.000  
+ 1st Qu.:3.090   1st Qu.:0.4100   1st Qu.: 9.50   1st Qu.:5.000  
+ Median :3.180   Median :0.4700   Median :10.40   Median :6.000  
+ Mean   :3.188   Mean   :0.4898   Mean   :10.51   Mean   :5.878  
+ 3rd Qu.:3.280   3rd Qu.:0.5500   3rd Qu.:11.40   3rd Qu.:6.000  
+ Max.   :3.820   Max.   :1.0800   Max.   :14.20   Max.   :9.000  
+null device 
+          1 
+     fixed.acidity volatile.acidity citric.acid residual.sugar chlorides
+4896           6.5             0.24        0.19            1.2     0.041
+4897           5.5             0.29        0.30            1.1     0.022
+4898           6.0             0.21        0.38            0.8     0.020
+     free.sulfur.dioxide total.sulfur.dioxide density   pH sulphates alcohol
+4896                  30                  111 0.99254 2.99      0.46     9.4
+4897                  20                  110 0.98869 3.34      0.38    12.8
+4898                  22                   98 0.98941 3.26      0.32    11.8
+     quality
+4896       6
+4897       7
+4898       6
+ fixed.acidity    volatile.acidity  citric.acid     residual.sugar  
+ Min.   : 3.800   Min.   :0.0800   Min.   :0.0000   Min.   : 0.600  
+ 1st Qu.: 6.300   1st Qu.:0.2100   1st Qu.:0.2700   1st Qu.: 1.700  
+ Median : 6.800   Median :0.2600   Median :0.3200   Median : 5.200  
+ Mean   : 6.855   Mean   :0.2782   Mean   :0.3342   Mean   : 6.377  
+ 3rd Qu.: 7.300   3rd Qu.:0.3200   3rd Qu.:0.3900   3rd Qu.: 9.900  
+ Max.   :14.200   Max.   :1.1000   Max.   :1.6600   Max.   :22.200  
+   chlorides       free.sulfur.dioxide total.sulfur.dioxide    density      
+ Min.   :0.01500   Min.   :  2.00      Min.   : 19.5        Min.   :0.9871  
+ 1st Qu.:0.03600   1st Qu.: 23.00      1st Qu.:108.0        1st Qu.:0.9917  
+ Median :0.04300   Median : 34.00      Median :134.0        Median :0.9937  
+ Mean   :0.04351   Mean   : 35.31      Mean   :138.2        Mean   :0.9940  
+ 3rd Qu.:0.05000   3rd Qu.: 46.00      3rd Qu.:167.0        3rd Qu.:0.9961  
+ Max.   :0.07100   Max.   :289.00      Max.   :255.5        Max.   :1.0390  
+       pH          sulphates         alcohol         quality     
+ Min.   :2.720   Min.   :0.2200   Min.   : 8.00   Min.   :3.000  
+ 1st Qu.:3.090   1st Qu.:0.4100   1st Qu.: 9.50   1st Qu.:5.000  
+ Median :3.180   Median :0.4700   Median :10.40   Median :6.000  
+ Mean   :3.188   Mean   :0.4898   Mean   :10.51   Mean   :5.878  
+ 3rd Qu.:3.280   3rd Qu.:0.5500   3rd Qu.:11.40   3rd Qu.:6.000  
+ Max.   :3.820   Max.   :1.0800   Max.   :14.20   Max.   :9.000  
+null device 
+          1 
+[1] "Skewness Report (Before Transformation):"
+                                 Variable Skewness
+volatile.acidity         volatile.acidity     1.58
+free.sulfur.dioxide   free.sulfur.dioxide     1.41
+citric.acid                   citric.acid     1.28
+density                           density     0.98
+sulphates                       sulphates     0.98
+residual.sugar             residual.sugar     0.75
+fixed.acidity               fixed.acidity     0.65
+alcohol                           alcohol     0.49
+pH                                     pH     0.46
+chlorides                       chlorides     0.42
+total.sulfur.dioxide total.sulfur.dioxide     0.26
+quality                           quality     0.16
+Warning message:
+`aes_string()` was deprecated in ggplot2 3.0.0.
+ℹ Please use tidy evaluation idioms with `aes()`.
+ℹ See also `vignette("ggplot2-in-packages")` for more information. 
+[1] 0
+[1] "Missing Value Report:"
+                                 Variable Missing Percent
+fixed.acidity               fixed.acidity    1000   20.42
+volatile.acidity         volatile.acidity    1000   20.42
+citric.acid                   citric.acid    1000   20.42
+residual.sugar             residual.sugar    1000   20.42
+chlorides                       chlorides    1000   20.42
+free.sulfur.dioxide   free.sulfur.dioxide    1000   20.42
+total.sulfur.dioxide total.sulfur.dioxide    1000   20.42
+density                           density    1000   20.42
+pH                                     pH    1000   20.42
+sulphates                       sulphates    1000   20.42
+alcohol                           alcohol    1000   20.42
+quality                           quality       0    0.00
+Warning message:
+Number of logged events: 10 
+Warning message:
+Number of logged events: 10 
+pdf 
+  2 
+pdf 
+  2 
+[1] "Model Performance Across Splits:"
+  Split RMSE  MAE R_Squared Train_Size Test_Size
+1 70-30 0.69 0.54      0.39       3429      1469
+2 80-20 0.73 0.57      0.36       3919       979
+3 90-10 0.69 0.54      0.40       4409       489
