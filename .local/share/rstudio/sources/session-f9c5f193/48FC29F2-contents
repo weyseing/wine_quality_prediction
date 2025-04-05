@@ -308,7 +308,7 @@ summary_all <- comparison_all %>%
 # layout
 n_features <- length(predictor_vars)
 n_rows <- ceiling(n_features / 1)
-height <- max(8, n_rows * 2.5)
+height <- max(20, n_rows * 5)
 
 ggplot(comparison_all, aes(x = Value, fill = Type)) +
   geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
@@ -334,22 +334,25 @@ ggplot(comparison_all, aes(x = Value, fill = Type)) +
        subtitle = "Blue: Original | Green: Scaled [0,1]",
        x = "Value",
        y = "Count") +
-  theme_minimal() +
+  theme_minimal(base_size = 22) + 
   theme(
     legend.position = "bottom",
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
-    strip.text = element_text(size = 9, face = "bold"),
-    panel.spacing = unit(1.5, "lines"),  # Increased spacing between panels
-    plot.title = element_text(size = 14),
-    plot.subtitle = element_text(size = 11)
+    legend.text = element_text(size = 10),
+    axis.text.x = element_text(angle = 0, hjust = 1, size = 10),
+    axis.text.y = element_text(size = 22),
+    axis.title = element_text(size = 22), 
+    strip.text = element_text(size = 22, face = "bold"),
+    plot.title = element_text(size = 22, face = "bold"),
+    plot.subtitle = element_text(size = 22),
+    panel.spacing = unit(1.5, "lines")
   )
 
-# Save with appropriate dimensions
 ggsave("min_max_scaling.png", 
-       width = 16, 
+       width = 20, 
        height = height, 
        units = "in",
-       dpi = 300)
+       dpi = 300,
+       limitsize = FALSE)
 
 
 

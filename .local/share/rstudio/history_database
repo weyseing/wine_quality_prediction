@@ -3995,3 +3995,387 @@
 1743852919133:height = height,
 1743852919133:units = "in",
 1743852919133:dpi = 300)
+1743853101554:# layout
+1743853101554:n_features <- length(predictor_vars)
+1743853101554:n_rows <- ceiling(n_features / 1)
+1743853101555:height <- max(10, n_rows * 3)
+1743853101555:ggplot(comparison_all, aes(x = Value, fill = Type)) +
+1743853101556:geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+1743853101556:# min/max lines
+1743853101556:geom_vline(data = summary_all,
+1743853101557:aes(xintercept = Min, color = Type),
+1743853101557:linetype = "dashed") +
+1743853101557:geom_vline(data = summary_all,
+1743853101557:aes(xintercept = Max, color = Type),
+1743853101557:linetype = "dashed") +
+1743853101558:# Facet grid
+1743853101558:facet_wrap(~ Feature,
+1743853101558:scales = "free",
+1743853101558:ncol = 1,
+1743853101558:labeller = label_wrap_gen(width = 25)) +
+1743853101559:# color & style
+1743853101559:scale_fill_manual(values = c("Original" = "lightblue", "Scaled" = "lightgreen")) +
+1743853101559:scale_color_manual(values = c("Original" = "blue", "Scaled" = "green")) +
+1743853101559:labs(title = "Min-Max Scaling Effects Across All Features",
+1743853101560:subtitle = "Blue: Original | Green: Scaled [0,1]",
+1743853101560:x = "Value",
+1743853101560:y = "Count") +
+1743853101560:theme_minimal() +
+1743853101561:theme(
+1743853101561:legend.position = "bottom",
+1743853101561:axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
+1743853101561:strip.text = element_text(size = 9, face = "bold"),
+1743853101561:panel.spacing = unit(1.5, "lines"),  # Increased spacing between panels
+1743853101562:plot.title = element_text(size = 16),
+1743853101562:plot.subtitle = element_text(size = 16)
+1743853101562:)
+1743853102359:# Save with appropriate dimensions
+1743853102359:ggsave("min_max_scaling.png",
+1743853102360:width = 20,
+1743853102360:height = height,
+1743853102360:units = "in",
+1743853102360:dpi = 300)
+1743853165776:# layout
+1743853165776:n_features <- length(predictor_vars)
+1743853165777:n_rows <- ceiling(n_features / 1)
+1743853165777:height <- max(10, n_rows * 3)
+1743853165777:ggplot(comparison_all, aes(x = Value, fill = Type)) +
+1743853165777:geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+1743853165777:# min/max lines
+1743853165777:geom_vline(data = summary_all,
+1743853165778:aes(xintercept = Min, color = Type),
+1743853165778:linetype = "dashed") +
+1743853165778:geom_vline(data = summary_all,
+1743853165778:aes(xintercept = Max, color = Type),
+1743853165778:linetype = "dashed") +
+1743853165778:# Facet grid
+1743853165779:facet_wrap(~ Feature,
+1743853165779:scales = "free",
+1743853165779:ncol = 1,
+1743853165779:labeller = label_wrap_gen(width = 25)) +
+1743853165780:# color & style
+1743853165780:scale_fill_manual(values = c("Original" = "lightblue", "Scaled" = "lightgreen")) +
+1743853165780:scale_color_manual(values = c("Original" = "blue", "Scaled" = "green")) +
+1743853165780:labs(title = "Min-Max Scaling Effects Across All Features",
+1743853165780:subtitle = "Blue: Original | Green: Scaled [0,1]",
+1743853165780:x = "Value",
+1743853165780:y = "Count") +
+1743853165780:theme_minimal(base_size = 12) +
+1743853165781:theme(
+1743853165781:legend.position = "bottom",
+1743853165781:legend.text = element_text(size = 10),
+1743853165781:axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+1743853165781:axis.text.y = element_text(size = 10),
+1743853165781:axis.title = element_text(size = 12),
+1743853165782:strip.text = element_text(size = 12, face = "bold"),
+1743853165782:plot.title = element_text(size = 16, face = "bold"),
+1743853165782:plot.subtitle = element_text(size = 14),
+1743853165782:panel.spacing = unit(1.5, "lines")
+1743853165782:)
+1743853166586:ggsave("min_max_scaling.png",
+1743853166586:width = 20,
+1743853166586:height = height,
+1743853166586:units = "in",
+1743853166586:dpi = 300)
+1743853199137:# layout
+1743853199138:n_features <- length(predictor_vars)
+1743853199139:n_rows <- ceiling(n_features / 1)
+1743853199139:height <- max(10, n_rows * 3)
+1743853199139:ggplot(comparison_all, aes(x = Value, fill = Type)) +
+1743853199140:geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+1743853199140:# min/max lines
+1743853199140:geom_vline(data = summary_all,
+1743853199140:aes(xintercept = Min, color = Type),
+1743853199141:linetype = "dashed") +
+1743853199141:geom_vline(data = summary_all,
+1743853199141:aes(xintercept = Max, color = Type),
+1743853199141:linetype = "dashed") +
+1743853199141:# Facet grid
+1743853199142:facet_wrap(~ Feature,
+1743853199142:scales = "free",
+1743853199142:ncol = 1,
+1743853199142:labeller = label_wrap_gen(width = 25)) +
+1743853199143:# color & style
+1743853199143:scale_fill_manual(values = c("Original" = "lightblue", "Scaled" = "lightgreen")) +
+1743853199143:scale_color_manual(values = c("Original" = "blue", "Scaled" = "green")) +
+1743853199143:labs(title = "Min-Max Scaling Effects Across All Features",
+1743853199144:subtitle = "Blue: Original | Green: Scaled [0,1]",
+1743853199144:x = "Value",
+1743853199144:y = "Count") +
+1743853199144:theme_minimal(base_size = 16) +
+1743853199145:theme(
+1743853199145:legend.position = "bottom",
+1743853199145:legend.text = element_text(size = 10),
+1743853199145:axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+1743853199146:axis.text.y = element_text(size = 16),
+1743853199146:axis.title = element_text(size = 16),
+1743853199146:strip.text = element_text(size = 16, face = "bold"),
+1743853199146:plot.title = element_text(size = 16, face = "bold"),
+1743853199146:plot.subtitle = element_text(size = 16),
+1743853199147:panel.spacing = unit(1.5, "lines")
+1743853199147:)
+1743853199969:ggsave("min_max_scaling.png",
+1743853199969:width = 20,
+1743853199969:height = height,
+1743853199969:units = "in",
+1743853199969:dpi = 300)
+1743853231683:n_features <- length(predictor_vars)
+1743853231683:n_rows <- ceiling(n_features / 1)
+1743853231683:height <- max(10, n_rows * 3)
+1743853231683:ggplot(comparison_all, aes(x = Value, fill = Type)) +
+1743853231684:geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+1743853231684:# min/max lines
+1743853231684:geom_vline(data = summary_all,
+1743853231684:aes(xintercept = Min, color = Type),
+1743853231684:linetype = "dashed") +
+1743853231684:geom_vline(data = summary_all,
+1743853231684:aes(xintercept = Max, color = Type),
+1743853231684:linetype = "dashed") +
+1743853231684:# Facet grid
+1743853231685:facet_wrap(~ Feature,
+1743853231685:scales = "free",
+1743853231685:ncol = 1,
+1743853231685:labeller = label_wrap_gen(width = 25)) +
+1743853231685:# color & style
+1743853231685:scale_fill_manual(values = c("Original" = "lightblue", "Scaled" = "lightgreen")) +
+1743853231685:scale_color_manual(values = c("Original" = "blue", "Scaled" = "green")) +
+1743853231685:labs(title = "Min-Max Scaling Effects Across All Features",
+1743853231685:subtitle = "Blue: Original | Green: Scaled [0,1]",
+1743853231686:x = "Value",
+1743853231686:y = "Count") +
+1743853231686:theme_minimal(base_size = 22) +
+1743853231686:theme(
+1743853231686:legend.position = "bottom",
+1743853231686:legend.text = element_text(size = 10),
+1743853231687:axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+1743853231687:axis.text.y = element_text(size = 22),
+1743853231687:axis.title = element_text(size = 22),
+1743853231687:strip.text = element_text(size = 22, face = "bold"),
+1743853231687:plot.title = element_text(size = 22, face = "bold"),
+1743853231687:plot.subtitle = element_text(size = 22),
+1743853231688:panel.spacing = unit(1.5, "lines")
+1743853231688:)
+1743853232510:ggsave("min_max_scaling.png",
+1743853232510:width = 20,
+1743853232510:height = height,
+1743853232510:units = "in",
+1743853232510:dpi = 300)
+1743853302797:# layout
+1743853302797:n_features <- length(predictor_vars)
+1743853302797:n_rows <- ceiling(n_features / 1)
+1743853302797:height <- max(10, n_rows * 5)
+1743853302798:ggplot(comparison_all, aes(x = Value, fill = Type)) +
+1743853302798:geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+1743853302798:# min/max lines
+1743853302798:geom_vline(data = summary_all,
+1743853302798:aes(xintercept = Min, color = Type),
+1743853302798:linetype = "dashed") +
+1743853302798:geom_vline(data = summary_all,
+1743853302798:aes(xintercept = Max, color = Type),
+1743853302799:linetype = "dashed") +
+1743853302799:# Facet grid
+1743853302799:facet_wrap(~ Feature,
+1743853302799:scales = "free",
+1743853302799:ncol = 1,
+1743853302799:labeller = label_wrap_gen(width = 25)) +
+1743853302800:# color & style
+1743853302800:scale_fill_manual(values = c("Original" = "lightblue", "Scaled" = "lightgreen")) +
+1743853302800:scale_color_manual(values = c("Original" = "blue", "Scaled" = "green")) +
+1743853302800:labs(title = "Min-Max Scaling Effects Across All Features",
+1743853302801:subtitle = "Blue: Original | Green: Scaled [0,1]",
+1743853302801:x = "Value",
+1743853302801:y = "Count") +
+1743853302801:theme_minimal(base_size = 22) +
+1743853302801:theme(
+1743853302802:legend.position = "bottom",
+1743853302802:legend.text = element_text(size = 10),
+1743853302802:axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+1743853302802:axis.text.y = element_text(size = 22),
+1743853302802:axis.title = element_text(size = 22),
+1743853302802:strip.text = element_text(size = 22, face = "bold"),
+1743853302803:plot.title = element_text(size = 22, face = "bold"),
+1743853302803:plot.subtitle = element_text(size = 22),
+1743853302803:panel.spacing = unit(1.5, "lines")
+1743853302803:)
+1743853303598:ggsave("min_max_scaling.png",
+1743853303598:width = 20,
+1743853303598:height = height,
+1743853303598:units = "in",
+1743853303598:dpi = 300)
+1743853364888:# layout
+1743853364888:n_features <- length(predictor_vars)
+1743853364888:n_rows <- ceiling(n_features / 1)
+1743853364889:height <- max(10, n_rows * 8)
+1743853364889:ggplot(comparison_all, aes(x = Value, fill = Type)) +
+1743853364889:geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+1743853364890:# min/max lines
+1743853364890:geom_vline(data = summary_all,
+1743853364890:aes(xintercept = Min, color = Type),
+1743853364890:linetype = "dashed") +
+1743853364890:geom_vline(data = summary_all,
+1743853364890:aes(xintercept = Max, color = Type),
+1743853364890:linetype = "dashed") +
+1743853364891:# Facet grid
+1743853364891:facet_wrap(~ Feature,
+1743853364891:scales = "free",
+1743853364891:ncol = 1,
+1743853364892:labeller = label_wrap_gen(width = 25)) +
+1743853364892:# color & style
+1743853364892:scale_fill_manual(values = c("Original" = "lightblue", "Scaled" = "lightgreen")) +
+1743853364892:scale_color_manual(values = c("Original" = "blue", "Scaled" = "green")) +
+1743853364892:labs(title = "Min-Max Scaling Effects Across All Features",
+1743853364893:subtitle = "Blue: Original | Green: Scaled [0,1]",
+1743853364893:x = "Value",
+1743853364893:y = "Count") +
+1743853364893:theme_minimal(base_size = 22) +
+1743853364894:theme(
+1743853364894:legend.position = "bottom",
+1743853364894:legend.text = element_text(size = 10),
+1743853364894:axis.text.x = element_text(angle = 0, hjust = 1, size = 10),
+1743853364895:axis.text.y = element_text(size = 22),
+1743853364895:axis.title = element_text(size = 22),
+1743853364895:strip.text = element_text(size = 22, face = "bold"),
+1743853364896:plot.title = element_text(size = 22, face = "bold"),
+1743853364896:plot.subtitle = element_text(size = 22),
+1743853364896:panel.spacing = unit(1.5, "lines")
+1743853364897:)
+1743853365851:ggsave("min_max_scaling.png",
+1743853365851:width = 20,
+1743853365851:height = height,
+1743853365851:units = "in",
+1743853365851:dpi = 300)
+1743853393145:summary_all <- comparison_all %>%
+1743853393145:group_by(Feature, Type) %>%
+1743853393145:summarise(
+1743853393145:Min = min(Value),
+1743853393145:Max = max(Value),
+1743853393145:.groups = 'drop'
+1743853393145:)
+1743853393158:# layout
+1743853393158:n_features <- length(predictor_vars)
+1743853393158:n_rows <- ceiling(n_features / 1)
+1743853393158:height <- max(20, n_rows * 8)
+1743853393158:ggplot(comparison_all, aes(x = Value, fill = Type)) +
+1743853393159:geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+1743853393159:# min/max lines
+1743853393159:geom_vline(data = summary_all,
+1743853393159:aes(xintercept = Min, color = Type),
+1743853393160:linetype = "dashed") +
+1743853393160:geom_vline(data = summary_all,
+1743853393160:aes(xintercept = Max, color = Type),
+1743853393160:linetype = "dashed") +
+1743853393160:# Facet grid
+1743853393161:facet_wrap(~ Feature,
+1743853393161:scales = "free",
+1743853393161:ncol = 1,
+1743853393161:labeller = label_wrap_gen(width = 25)) +
+1743853393161:# color & style
+1743853393162:scale_fill_manual(values = c("Original" = "lightblue", "Scaled" = "lightgreen")) +
+1743853393162:scale_color_manual(values = c("Original" = "blue", "Scaled" = "green")) +
+1743853393162:labs(title = "Min-Max Scaling Effects Across All Features",
+1743853393162:subtitle = "Blue: Original | Green: Scaled [0,1]",
+1743853393162:x = "Value",
+1743853393162:y = "Count") +
+1743853393163:theme_minimal(base_size = 22) +
+1743853393163:theme(
+1743853393163:legend.position = "bottom",
+1743853393163:legend.text = element_text(size = 10),
+1743853393163:axis.text.x = element_text(angle = 0, hjust = 1, size = 10),
+1743853393164:axis.text.y = element_text(size = 22),
+1743853393164:axis.title = element_text(size = 22),
+1743853393164:strip.text = element_text(size = 22, face = "bold"),
+1743853393164:plot.title = element_text(size = 22, face = "bold"),
+1743853393164:plot.subtitle = element_text(size = 22),
+1743853393164:panel.spacing = unit(1.5, "lines")
+1743853393165:)
+1743853393947:ggsave("min_max_scaling.png",
+1743853393947:width = 20,
+1743853393947:height = height,
+1743853393947:units = "in",
+1743853393947:dpi = 300)
+1743853417349:# layout
+1743853417349:n_features <- length(predictor_vars)
+1743853417349:n_rows <- ceiling(n_features / 1)
+1743853417350:height <- max(20, n_rows * 8)
+1743853417350:ggplot(comparison_all, aes(x = Value, fill = Type)) +
+1743853417350:geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+1743853417351:# min/max lines
+1743853417351:geom_vline(data = summary_all,
+1743853417351:aes(xintercept = Min, color = Type),
+1743853417351:linetype = "dashed") +
+1743853417351:geom_vline(data = summary_all,
+1743853417351:aes(xintercept = Max, color = Type),
+1743853417352:linetype = "dashed") +
+1743853417352:# Facet grid
+1743853417352:facet_wrap(~ Feature,
+1743853417352:scales = "free",
+1743853417352:ncol = 1,
+1743853417352:labeller = label_wrap_gen(width = 25)) +
+1743853417353:# color & style
+1743853417353:scale_fill_manual(values = c("Original" = "lightblue", "Scaled" = "lightgreen")) +
+1743853417353:scale_color_manual(values = c("Original" = "blue", "Scaled" = "green")) +
+1743853417353:labs(title = "Min-Max Scaling Effects Across All Features",
+1743853417354:subtitle = "Blue: Original | Green: Scaled [0,1]",
+1743853417354:x = "Value",
+1743853417354:y = "Count") +
+1743853417354:theme_minimal(base_size = 22) +
+1743853417354:theme(
+1743853417355:legend.position = "bottom",
+1743853417355:legend.text = element_text(size = 10),
+1743853417355:axis.text.x = element_text(angle = 0, hjust = 1, size = 10),
+1743853417355:axis.text.y = element_text(size = 22),
+1743853417355:axis.title = element_text(size = 22),
+1743853417355:strip.text = element_text(size = 22, face = "bold"),
+1743853417356:plot.title = element_text(size = 22, face = "bold"),
+1743853417356:plot.subtitle = element_text(size = 22),
+1743853417356:panel.spacing = unit(1.5, "lines")
+1743853417356:)
+1743853418257:ggsave("min_max_scaling.png",
+1743853418257:width = 20,
+1743853418258:height = height,
+1743853418258:units = "in",
+1743853418258:dpi = 300,
+1743853418258:limitsize = FALSE)
+1743853502243:# layout
+1743853502243:n_features <- length(predictor_vars)
+1743853502243:n_rows <- ceiling(n_features / 1)
+1743853502244:height <- max(20, n_rows * 5)
+1743853502244:ggplot(comparison_all, aes(x = Value, fill = Type)) +
+1743853502244:geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+1743853502245:# min/max lines
+1743853502245:geom_vline(data = summary_all,
+1743853502246:aes(xintercept = Min, color = Type),
+1743853502246:linetype = "dashed") +
+1743853502246:geom_vline(data = summary_all,
+1743853502247:aes(xintercept = Max, color = Type),
+1743853502247:linetype = "dashed") +
+1743853502247:# Facet grid
+1743853502248:facet_wrap(~ Feature,
+1743853502248:scales = "free",
+1743853502248:ncol = 1,
+1743853502248:labeller = label_wrap_gen(width = 25)) +
+1743853502248:# color & style
+1743853502249:scale_fill_manual(values = c("Original" = "lightblue", "Scaled" = "lightgreen")) +
+1743853502249:scale_color_manual(values = c("Original" = "blue", "Scaled" = "green")) +
+1743853502249:labs(title = "Min-Max Scaling Effects Across All Features",
+1743853502249:subtitle = "Blue: Original | Green: Scaled [0,1]",
+1743853502249:x = "Value",
+1743853502250:y = "Count") +
+1743853502250:theme_minimal(base_size = 22) +
+1743853502250:theme(
+1743853502250:legend.position = "bottom",
+1743853502250:legend.text = element_text(size = 10),
+1743853502250:axis.text.x = element_text(angle = 0, hjust = 1, size = 10),
+1743853502250:axis.text.y = element_text(size = 22),
+1743853502251:axis.title = element_text(size = 22),
+1743853502251:strip.text = element_text(size = 22, face = "bold"),
+1743853502251:plot.title = element_text(size = 22, face = "bold"),
+1743853502251:plot.subtitle = element_text(size = 22),
+1743853502251:panel.spacing = unit(1.5, "lines")
+1743853502252:)
+1743853503077:ggsave("min_max_scaling.png",
+1743853503078:width = 20,
+1743853503078:height = height,
+1743853503078:units = "in",
+1743853503078:dpi = 300,
+1743853503078:limitsize = FALSE)
