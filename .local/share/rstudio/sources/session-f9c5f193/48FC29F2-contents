@@ -307,7 +307,7 @@ summary_all <- comparison_all %>%
 
 # layout
 n_features <- length(predictor_vars)
-n_rows <- ceiling(n_features / 2)
+n_rows <- ceiling(n_features / 1)
 height <- max(8, n_rows * 2.5)
 
 ggplot(comparison_all, aes(x = Value, fill = Type)) +
@@ -324,7 +324,7 @@ ggplot(comparison_all, aes(x = Value, fill = Type)) +
   # Facet grid
   facet_wrap(~ Feature, 
              scales = "free", 
-             ncol = 2,
+             ncol = 1,
              labeller = label_wrap_gen(width = 25)) +  
   
   # color & style
