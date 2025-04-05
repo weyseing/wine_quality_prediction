@@ -4,5 +4,6 @@
         "name": "Tomorrow Night",
         "url": "theme/default/tomorrow_night.rstheme",
         "isDark": true
-    }
+    },
+    "error_handler_type": "traceback"
 }

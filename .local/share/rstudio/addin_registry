@@ -16,5 +16,23 @@
         "interactive": false,
         "binding": "clipr_result",
         "ordinal": 1
+    },
+    "reprex::reprex_addin": {
+        "name": "Render reprex...",
+        "package": "reprex",
+        "title": "",
+        "description": "Run `reprex::reprex()` to prepare a reproducible example for sharing.",
+        "interactive": true,
+        "binding": "reprex_addin",
+        "ordinal": 3
+    },
+    "reprex::reprex_selection": {
+        "name": "Reprex selection",
+        "package": "reprex",
+        "title": "",
+        "description": "Prepare reprex from current selection",
+        "interactive": false,
+        "binding": "reprex_selection",
+        "ordinal": 4
     }
 }
