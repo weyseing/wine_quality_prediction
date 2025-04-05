@@ -32,5 +32,6 @@
     "source_with_echo": true,
     "initial_working_directory": "~",
     "editor_theme": "Tomorrow Night",
-    "posix_terminal_shell": "bash"
+    "posix_terminal_shell": "bash",
+    "jobs_tab_visibility": "shown"
 }

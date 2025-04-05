@@ -105,3 +105,355 @@
 1743703687590:tail(winequality, n=3)
 1743703687598:# summary
 1743703687599:summary(winequality)
+1743836381409:install.packages("dplyr")
+1743836383829:library(dplyr)
+1743836384469:# dataset
+1743836384469:winequality <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv", sep = ";")
+1743836386694:tail(winequality, n=3)
+1743836386699:# summary
+1743836386699:summary(winequality)
+1743836386709:# outlier (verify)
+1743836386710:outlier_vars <- c("residual.sugar", "chlorides", "total.sulfur.dioxide")
+1743836386710:par(mfrow = c(1, 3))  # Arrange plots in 1 row, 3 columns
+1743836386780:for (var in outlier_vars) {
+1743836386780:boxplot(winequality[[var]],
+1743836386780:main = paste(var, "Distribution"),
+1743836386780:ylab = var)
+1743836386781:}
+1743836386868:# IQR
+1743836386868:detect_outliers <- function(x) {
+1743836386868:Q1 <- quantile(x, 0.25, na.rm = TRUE)
+1743836386868:Q3 <- quantile(x, 0.75, na.rm = TRUE)
+1743836386869:IQR <- Q3 - Q1
+1743836386869:lower_bound <- Q1 - 1.5 * IQR
+1743836386869:upper_bound <- Q3 + 1.5 * IQR
+1743836386869:return(list(lower = lower_bound, upper = upper_bound))
+1743836386869:}
+1743836386870:# winsorize outliers
+1743836386870:winsorize_iqr <- function(x) {
+1743836386870:bounds <- detect_outliers(x)
+1743836386871:x[x < bounds$lower] <- bounds$lower  # Replace lower outliers with Q1 - 1.5*IQR
+1743836386871:x[x > bounds$upper] <- bounds$upper  # Replace upper outliers with Q3 + 1.5*IQR
+1743836386871:return(x)
+1743836386871:}
+1743836386872:winequality <- winequality %>%
+1743836386872:mutate(across(all_of(outlier_vars), ~ winsorize(.x)))
+1743836577790:# IQR
+1743836577790:detect_outliers <- function(x) {
+1743836577791:Q1 <- quantile(x, 0.25, na.rm = TRUE)
+1743836577791:Q3 <- quantile(x, 0.75, na.rm = TRUE)
+1743836577791:IQR <- Q3 - Q1
+1743836577791:lower_bound <- Q1 - 1.5 * IQR
+1743836577791:upper_bound <- Q3 + 1.5 * IQR
+1743836577791:return(list(lower = lower_bound, upper = upper_bound))
+1743836577791:}
+1743836577792:# winsorize outliers
+1743836577792:winsorize_iqr <- function(x) {
+1743836577793:bounds <- detect_outliers(x)
+1743836577794:x[x < bounds$lower] <- bounds$lower  # Replace lower outliers with Q1 - 1.5*IQR
+1743836577794:x[x > bounds$upper] <- bounds$upper  # Replace upper outliers with Q3 + 1.5*IQR
+1743836577794:return(x)
+1743836577794:}
+1743836577795:winequality <- winequality %>%
+1743836577795:mutate(across(all_of(outlier_vars), ~ winsorize_iqr(.x)))
+1743836577811:tail(winequality, n=3)
+1743836577814:summary(winequality)
+1743836602424:outlier_vars <- c("residual.sugar", "chlorides", "total.sulfur.dioxide")
+1743836602424:par(mfrow = c(1, 3))  # Arrange plots in 1 row, 3 columns
+1743836602425:for (var in outlier_vars) {
+1743836602425:boxplot(winequality[[var]],
+1743836602425:main = paste(var, "Distribution"),
+1743836602425:ylab = var)
+1743836602425:}
+1743836611012:# dataset
+1743836611012:winequality <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv", sep = ";")
+1743836612277:tail(winequality, n=3)
+1743836613686:# summary
+1743836613686:summary(winequality)
+1743836615715:# outlier (verify)
+1743836615717:outlier_vars <- c("residual.sugar", "chlorides", "total.sulfur.dioxide")
+1743836615717:par(mfrow = c(1, 3))  # Arrange plots in 1 row, 3 columns
+1743836615717:for (var in outlier_vars) {
+1743836615717:boxplot(winequality[[var]],
+1743836615718:main = paste(var, "Distribution"),
+1743836615718:ylab = var)
+1743836615718:}
+1743836709427:png("outlier_check_before.png", width = 1200, height = 400)
+1743836709428:par(mfrow = c(1, 3))
+1743836709428:outlier_vars <- c("residual.sugar", "chlorides", "total.sulfur.dioxide")
+1743836709428:for (var in outlier_vars) {
+1743836709428:boxplot(winequality[[var]],
+1743836709428:main = paste(var, "Distribution"),
+1743836709428:ylab = var)
+1743836709428:}
+1743836709461:dev.off()
+1743836758013:# IQR
+1743836758014:detect_outliers <- function(x) {
+1743836758014:Q1 <- quantile(x, 0.25, na.rm = TRUE)
+1743836758014:Q3 <- quantile(x, 0.75, na.rm = TRUE)
+1743836758014:IQR <- Q3 - Q1
+1743836758015:lower_bound <- Q1 - 1.5 * IQR
+1743836758015:upper_bound <- Q3 + 1.5 * IQR
+1743836758015:return(list(lower = lower_bound, upper = upper_bound))
+1743836758015:}
+1743836758016:# winsorize outliers
+1743836758016:winsorize_iqr <- function(x) {
+1743836758016:bounds <- detect_outliers(x)
+1743836758016:x[x < bounds$lower] <- bounds$lower  # Replace lower outliers with Q1 - 1.5*IQR
+1743836758017:x[x > bounds$upper] <- bounds$upper  # Replace upper outliers with Q3 + 1.5*IQR
+1743836758017:return(x)
+1743836758017:}
+1743836758017:winequality <- winequality %>%
+1743836758018:mutate(across(all_of(outlier_vars), ~ winsorize_iqr(.x)))
+1743836758049:tail(winequality, n=3)
+1743836758062:summary(winequality)
+1743836760404:# check outlier
+1743836760405:png("outlier_check_before.png", width = 1200, height = 400)
+1743836760406:par(mfrow = c(1, 3))
+1743836760406:outlier_vars <- c("residual.sugar", "chlorides", "total.sulfur.dioxide")
+1743836760407:for (var in outlier_vars) {
+1743836760407:boxplot(winequality[[var]],
+1743836760407:main = paste(var, "Distribution"),
+1743836760407:ylab = var)
+1743836760408:}
+1743836760419:dev.off()
+1743836769385:# library
+1743836769385:install.packages("dplyr")
+1743836769434:library(dplyr)
+1743836769435:# dataset
+1743836769435:winequality <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv", sep = ";")
+1743836771414:tail(winequality, n=3)
+1743836771417:# summary
+1743836771417:summary(winequality)
+1743836771426:# check outlier
+1743836771427:png("outlier_check_before.png", width = 1200, height = 400)
+1743836771427:par(mfrow = c(1, 3))
+1743836771427:outlier_vars <- c("residual.sugar", "chlorides", "total.sulfur.dioxide")
+1743836771428:for (var in outlier_vars) {
+1743836771428:boxplot(winequality[[var]],
+1743836771428:main = paste(var, "Distribution"),
+1743836771428:ylab = var)
+1743836771428:}
+1743836771440:dev.off()
+1743836771459:# IQR
+1743836771459:detect_outliers <- function(x) {
+1743836771459:Q1 <- quantile(x, 0.25, na.rm = TRUE)
+1743836771459:Q3 <- quantile(x, 0.75, na.rm = TRUE)
+1743836771459:IQR <- Q3 - Q1
+1743836771459:lower_bound <- Q1 - 1.5 * IQR
+1743836771459:upper_bound <- Q3 + 1.5 * IQR
+1743836771459:return(list(lower = lower_bound, upper = upper_bound))
+1743836771460:}
+1743836771460:# winsorize outliers
+1743836771460:winsorize_iqr <- function(x) {
+1743836771460:bounds <- detect_outliers(x)
+1743836771460:x[x < bounds$lower] <- bounds$lower  # Replace lower outliers with Q1 - 1.5*IQR
+1743836771460:x[x > bounds$upper] <- bounds$upper  # Replace upper outliers with Q3 + 1.5*IQR
+1743836771460:return(x)
+1743836771460:}
+1743836771461:winequality <- winequality %>%
+1743836771461:mutate(across(all_of(outlier_vars), ~ winsorize_iqr(.x)))
+1743836771476:tail(winequality, n=3)
+1743836771480:summary(winequality)
+1743836771489:# check outlier
+1743836771489:png("outlier_check_after.png", width = 1200, height = 400)
+1743836771489:par(mfrow = c(1, 3))
+1743836771490:outlier_vars <- c("residual.sugar", "chlorides", "total.sulfur.dioxide")
+1743836771490:for (var in outlier_vars) {
+1743836771490:boxplot(winequality[[var]],
+1743836771490:main = paste(var, "Distribution"),
+1743836771490:ylab = var)
+1743836771490:}
+1743836771500:dev.off()
+1743836772466:install.packages("dplyr")
+1743837786952:library(e1071)
+1743837796375:install.packages("e1071")
+1743837804366:library(e1071)
+1743837882424:original_skewness <- sapply(winequality[, outlier_vars], skewness)
+1743837882425:print("Original Skewness:")
+1743837882426:print(original_skewness)
+1743838041892:library(gridExtra)
+1743838054545:original_plots <- lapply(outlier_vars, function(var) {
+1743838054545:skew_val <- round(skewness(winequality[[var]]), 2)
+1743838054545:ggplot(winequality, aes_string(var)) +
+1743838054545:geom_histogram(bins = 30, fill = "lightblue", color = "black") +
+1743838054546:geom_vline(aes(xintercept = mean(winequality[[var]])),
+1743838054546:color = "red", linetype = "dashed") +
+1743838054546:annotate("text", x = Inf, y = Inf,
+1743838054546:label = paste("Skewness:", skew_val),
+1743838054547:hjust = 1.2, vjust = 1.2, size = 4) +
+1743838054547:ggtitle(paste("Original", var)) +
+1743838054547:theme_minimal()
+1743838054548:})
+1743838068980:library(gridExtra)
+1743838113871:install.packages("gridExtra")
+1743838118679:library(gridExtra)
+1743838124641:install.packages("ggplot2")
+1743838148505:# dataset
+1743838148505:winequality <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv", sep = ";")
+1743838150546:library(ggplot2)
+1743838150633:original_plots <- lapply(outlier_vars, function(var) {
+1743838150634:skew_val <- round(skewness(winequality[[var]]), 2)
+1743838150634:ggplot(winequality, aes_string(var)) +
+1743838150634:geom_histogram(bins = 30, fill = "lightblue", color = "black") +
+1743838150634:geom_vline(aes(xintercept = mean(winequality[[var]])),
+1743838150634:color = "red", linetype = "dashed") +
+1743838150634:annotate("text", x = Inf, y = Inf,
+1743838150634:label = paste("Skewness:", skew_val),
+1743838150634:hjust = 1.2, vjust = 1.2, size = 4) +
+1743838150635:ggtitle(paste("Original", var)) +
+1743838150635:theme_minimal()
+1743838150635:})
+1743838169051:# log transformation
+1743838169051:winequality <- winequality %>%
+1743838169051:mutate(across(all_of(outlier_vars), ~ log1p(.x)))
+1743838184114:transformed_plots <- lapply(outlier_vars, function(var) {
+1743838184114:skew_val <- round(skewness(winequality[[var]]), 2)
+1743838184115:ggplot(winequality, aes(x = .data[[var]])) +
+1743838184115:geom_histogram(bins = 30, fill = "lightgreen", color = "black") +
+1743838184115:geom_vline(aes(xintercept = mean(.data[[var]])),
+1743838184115:color = "darkgreen", linetype = "dashed") +
+1743838184115:annotate("text", x = Inf, y = Inf,
+1743838184115:label = paste("Skewness:", skew_val),
+1743838184116:hjust = 1.2, vjust = 1.2, size = 4) +
+1743838184116:ggtitle(paste("Transformed", var)) +
+1743838184116:theme_minimal()
+1743838184116:})
+1743838194069:combined_plots <- c(original_plots, transformed_plots)
+1743838194070:do.call(grid.arrange, c(combined_plots, ncol = 3, nrow = 2))
+1743838464777:# display plots
+1743838464777:combined_plots <- c(original_plots, transformed_plots)
+1743838464777:do.call(grid.arrange, c(combined_plots, ncol = 3, nrow = 2))
+1743838488332:summary(winequality)
+1743838730288:# library
+1743838730289:install.packages("dplyr")
+1743838730291:install.packages("e1071")
+1743838730292:install.packages("gridExtra")
+1743838730293:install.packages("ggplot2")
+1743838730294:library(dplyr)
+1743838730295:library(e1071)
+1743838730295:library(gridExtra)
+1743838730296:library(ggplot2)
+1743838730296:# dataset
+1743838730296:winequality <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv", sep = ";")
+1743838731965:tail(winequality, n=3)
+1743838731971:# summary
+1743838731971:summary(winequality)
+1743838731981:# === OUTLIER HANDLING ===
+1743838731981:# check outlier
+1743838731983:png("outlier_check_before.png", width = 1200, height = 400)
+1743838731984:par(mfrow = c(1, 3))
+1743838731984:outlier_vars <- c("residual.sugar", "chlorides", "total.sulfur.dioxide")
+1743838731984:for (var in outlier_vars) {
+1743838731985:boxplot(winequality[[var]],
+1743838731985:main = paste(var, "Distribution"),
+1743838731985:ylab = var)
+1743838731985:}
+1743838731997:dev.off()
+1743838732018:# IQR
+1743838732018:detect_outliers <- function(x) {
+1743838732018:Q1 <- quantile(x, 0.25, na.rm = TRUE)
+1743838732019:Q3 <- quantile(x, 0.75, na.rm = TRUE)
+1743838732019:IQR <- Q3 - Q1
+1743838732019:lower_bound <- Q1 - 1.5 * IQR
+1743838732019:upper_bound <- Q3 + 1.5 * IQR
+1743838732019:return(list(lower = lower_bound, upper = upper_bound))
+1743838732019:}
+1743838732019:# winsorize outliers
+1743838732019:winsorize_iqr <- function(x) {
+1743838732019:bounds <- detect_outliers(x)
+1743838732019:x[x < bounds$lower] <- bounds$lower  # Replace lower outliers with Q1 - 1.5*IQR
+1743838732019:x[x > bounds$upper] <- bounds$upper  # Replace upper outliers with Q3 + 1.5*IQR
+1743838732019:return(x)
+1743838732020:}
+1743838732020:winequality <- winequality %>%
+1743838732020:mutate(across(all_of(outlier_vars), ~ winsorize_iqr(.x)))
+1743838732035:tail(winequality, n=3)
+1743838732037:summary(winequality)
+1743838732044:# check outlier
+1743838732044:png("outlier_check_after.png", width = 1200, height = 400)
+1743838732045:par(mfrow = c(1, 3))
+1743838732045:outlier_vars <- c("residual.sugar", "chlorides", "total.sulfur.dioxide")
+1743838732045:for (var in outlier_vars) {
+1743838732046:boxplot(winequality[[var]],
+1743838732046:main = paste(var, "Distribution"),
+1743838732046:ylab = var)
+1743838732046:}
+1743838732107:dev.off()
+1743838732128:install.packages("ggplot2")
+1743838735119:install.packages("gridExtra")
+1743838737130:install.packages("e1071")
+1743838737131:install.packages("dplyr")
+1743838738662:install.packages("dplyr")
+1743838741080:install.packages("e1071")
+1743838747552:skewness_report <- data.frame(
+1743838747552:Variable = numeric_vars,
+1743838747552:Skewness = round(sapply(winequality[, numeric_vars], skewness), 2)
+1743838747552:)
+1743838758019:numeric_vars <- names(winequality)[sapply(winequality, is.numeric)]
+1743838758019:skewness_report <- data.frame(
+1743838758019:Variable = numeric_vars,
+1743838758019:Skewness = round(sapply(winequality[, numeric_vars], skewness), 2)
+1743838758019:)
+1743838761987:numeric_vars <- names(winequality)[sapply(winequality, is.numeric)]
+1743838761987:skewness_report <- data.frame(
+1743838761987:Variable = numeric_vars,
+1743838761987:Skewness = round(sapply(winequality[, numeric_vars], skewness), 2)
+1743838761988:)
+1743838768907:# calc skewness
+1743838768907:numeric_vars <- names(winequality)[sapply(winequality, is.numeric)]
+1743838771817:skewness_report <- data.frame(
+1743838771817:Variable = numeric_vars,
+1743838771817:Skewness = round(sapply(winequality[, numeric_vars], skewness), 2)
+1743838771818:)
+1743838781345:skewness_report <- skewness_report[order(-abs(skewness_report$Skewness)), ]
+1743838787787:print("Skewness Report (Before Transformation):")
+1743838787787:print(skewness_report)
+1743838904992:high_skew_vars <- skewness_report %>%
+1743838904992:filter(Skewness > 1) %>%
+1743838904992:pull(Variable)
+1743838908627:# check skewness
+1743838908627:original_plots <- lapply(high_skew_vars, function(var) {
+1743838908627:skew_val <- round(skewness(winequality[[var]]), 2)
+1743838908627:ggplot(winequality, aes_string(var)) +
+1743838908627:geom_histogram(bins = 30, fill = "lightblue", color = "black") +
+1743838908627:geom_vline(aes(xintercept = mean(winequality[[var]])),
+1743838908627:color = "red", linetype = "dashed") +
+1743838908628:annotate("text", x = Inf, y = Inf,
+1743838908628:label = paste("Skewness:", skew_val),
+1743838908628:hjust = 1.2, vjust = 1.2, size = 4) +
+1743838908628:ggtitle(paste("Original", var)) +
+1743838908628:theme_minimal()
+1743838908628:})
+1743838911955:# log transformation
+1743838911955:winequality <- winequality %>%
+1743838911955:mutate(across(all_of(outlier_vars), ~ log1p(.x)))
+1743838911961:# check skewness
+1743838911961:transformed_plots <- lapply(outlier_vars, function(var) {
+1743838911961:skew_val <- round(skewness(winequality[[var]]), 2)
+1743838911961:ggplot(winequality, aes(x = .data[[var]])) +
+1743838911961:geom_histogram(bins = 30, fill = "lightgreen", color = "black") +
+1743838911961:geom_vline(aes(xintercept = mean(.data[[var]])),
+1743838911961:color = "darkgreen", linetype = "dashed") +
+1743838911962:annotate("text", x = Inf, y = Inf,
+1743838911962:label = paste("Skewness:", skew_val),
+1743838911962:hjust = 1.2, vjust = 1.2, size = 4) +
+1743838911962:ggtitle(paste("Transformed", var)) +
+1743838911962:theme_minimal()
+1743838911962:})
+1743838912011:# display plots
+1743838912011:combined_plots <- c(original_plots, transformed_plots)
+1743838912011:do.call(grid.arrange, c(combined_plots, ncol = 3, nrow = 2))
+1743839025334:do.call(grid.arrange, c(combined_plots, ncol = 3, nrow = 2))
+1743839026036:combined_plots <- c(original_plots, transformed_plots)
+1743839026036:dev.off()
+1743839068271:ggsave(
+1743839068271:"log_transformation_comparison.png",
+1743839068271:arrangeGrob(grobs = combined_plots, ncol = 3, nrow = 2),
+1743839068271:width = 14, height = 8
+1743839068271:)
+1743839084364:ggsave(
+1743839084365:"log_transformation.png",
+1743839084365:arrangeGrob(grobs = combined_plots, ncol = 3, nrow = 2),
+1743839084365:width = 14, height = 8
+1743839084365:)

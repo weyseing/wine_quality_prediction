@@ -3,7 +3,7 @@
     "path": "~/wine_quality_predict.R",
     "project_path": null,
     "type": "r_source",
-    "hash": "32340556",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1743699447475.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "24,16",
-        "scrollLine": "2"
+        "cursorPosition": "115,0",
+        "scrollLine": "81"
     },
     "folds": "",
-    "lastKnownWriteTime": 1743703719,
+    "lastKnownWriteTime": 1743839082,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1743703719197,
+    "last_content_update": 1743839082423,
     "read_only": false,
     "read_only_alternatives": []
 }
